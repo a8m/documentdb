@@ -1,7 +1,6 @@
 package documentdb
 
 import (
-	"fmt"
 )
 
 type Config struct {
@@ -9,18 +8,20 @@ type Config struct {
 }
 
 type DocumentDB struct {
-	Url	string
-	Config	Config
 	client	*Client
 }
 
 // Create DocumentClient
 func New(url string, config Config) *DocumentDB {
-	return &DocumentDB{url, config, &Client{}}
+	client := &Client{}
+	client.Url = url
+	client.Config = config
+	return &DocumentDB{client}
 }
 
 // Read database by self link
-//func ( Client) ReadDatabase(link string) (*Database, error) {
-//	link = "/" + link + "/"
-//
-//}
+func (c *DocumentDB) ReadDatabase(link string) (*Database, error) {
+	db := &Database{}
+	c.client.Read(link, "dbs", db)
+	return nil, nil
+}
