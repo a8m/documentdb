@@ -24,6 +24,7 @@ func ResourceRequest(rId, rType string, req *http.Request) *Request {
 
 func (req *Request) DefaultHeaders(mKey string) error {
 	req.Header.Add(HEADER_XDATE, time.Now().UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT"))
+	req.Header.Add("x-ms-version", "2014-08-21")
 
 	// Auth
 	parts := []string{req.Method, req.rType, req.rId, req.Header.Get(HEADER_XDATE), req.Header.Get("Date"), ""}
@@ -37,3 +38,22 @@ func (req *Request) DefaultHeaders(mKey string) error {
 	req.Header.Add(HEADER_AUTH, url.QueryEscape("type=" + masterToken + "&ver=" + tokenVersion + "&sig=" +sign))
 	return nil
 }
+
+// Response Example
+// { type: 'dbs',
+// objectBody: { id: 'b5NCAA==', self: '/dbs/b5NCAA==/' } }
+//
+// { type: 'colls',
+// objectBody: { id: 'b5NCAIu9NwA=', self: '/dbs/b5NCAA==/colls/b5NCAIu9NwA=/' } }
+//
+// Should return a type/id struct
+func parse(id string) {
+	if strings.HasPrefix(id, "/") == false {
+		id = "/" + id
+	}
+	if strings.HasSuffix(id, "/") == false {
+		id = id + "/"
+	}
+}
+
+

@@ -29,8 +29,8 @@ func (c *Client) Read(rId, rType string, ret interface{}) error {
 	}
 
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+	body, err := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body), err, "foo")
 	return nil
 }
 
