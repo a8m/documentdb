@@ -1,3 +1,10 @@
+//
+// This project start as a fork of `github.com/nerdylikeme/go-documentdb` version
+// but changed a bit, and may be changed later
+//
+// Goal: add the full functionality of documentdb, align with the other sdks
+// and make it more testable
+//
 package documentdb
 
 type Config struct {
