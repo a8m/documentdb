@@ -1,4 +1,4 @@
-//
+
 // This project start as a fork of `github.com/nerdylikeme/go-documentdb` version
 // but changed a bit, and may be changed later
 //
@@ -12,7 +12,7 @@ type Config struct {
 }
 
 type DocumentDB struct {
-	client	*Client
+	client	Clienter
 }
 
 // Create DocumentClient

@@ -8,6 +8,10 @@ import (
 	"io"
 )
 
+type Clienter interface {
+	Read(link string, ret interface{}) error
+}
+
 type Client struct {
 	Url	string
 	Config	Config
