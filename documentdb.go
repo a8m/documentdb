@@ -22,6 +22,9 @@ func New(url string, config Config) *DocumentDB {
 // Read database by self link
 func (c *DocumentDB) ReadDatabase(link string) (*Database, error) {
 	db := &Database{}
-	c.client.Read(link, "dbs", db)
-	return nil, nil
+	err := c.client.Read(link, db)
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
 }

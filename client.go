@@ -1,11 +1,11 @@
 package documentdb
 
 import (
-	"fmt"
+	"encoding/json"
 	"strings"
 	"net/http"
 	"bytes"
-	"io/ioutil"
+	"io"
 )
 
 type Client struct {
@@ -14,12 +14,12 @@ type Client struct {
 	http.Client
 }
 
-func (c *Client) Read(rId, rType string, ret interface{}) error {
-	req, err := http.NewRequest("GET", path(c.Url, rId), &bytes.Buffer{})
+func (c *Client) Read(link string, ret interface{}) error {
+	req, err := http.NewRequest("GET", path(c.Url, link), &bytes.Buffer{})
 	if err != nil {
 		return err
 	}
-	r := ResourceRequest(rId, rType, req)
+	r := ResourceRequest(link, req)
 	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
 		return err
 	}
@@ -29,9 +29,7 @@ func (c *Client) Read(rId, rType string, ret interface{}) error {
 	}
 
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body), err, "foo")
-	return nil
+	return readJson(resp.Body, ret)
 }
 
 // Generate link
@@ -41,13 +39,7 @@ func path(url string, args ...string) (link string) {
 	return
 }
 
-
-// Default Headers
-//{
-// 	'Cache-Control': 'no-cache',
-//	'x-ms-version': '2014-08-21',
-//	'User-Agent': 'documentdb-nodejs-sdk-0.9.1',
-//	'x-ms-date': 'Sat, 07 Mar 2015 20:42:27 GMT',
-//	authorization: 'type%3Dmaster%26ver%3D1.0%26sig%3DObTpHah0GgBLJ1KMGITRMM9G5%2F4YRodrBrInUR3t%2B00%3D',
-//	Accept: 'application/json'
-// }
+// Read json response to given interface(struct, map, ..)
+func readJson(reader io.Reader, data interface{}) error {
+	return json.NewDecoder(reader).Decode(&data)
+}

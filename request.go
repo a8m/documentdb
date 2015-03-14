@@ -18,7 +18,8 @@ type Request struct {
 	*http.Request
 }
 
-func ResourceRequest(rId, rType string, req *http.Request) *Request {
+func ResourceRequest(link string, req *http.Request) *Request {
+	rId, rType := parse(link)
 	return &Request{rId, rType, req}
 }
 
@@ -47,13 +48,25 @@ func (req *Request) DefaultHeaders(mKey string) error {
 // objectBody: { id: 'b5NCAIu9NwA=', self: '/dbs/b5NCAA==/colls/b5NCAIu9NwA=/' } }
 //
 // Should return a type/id struct
-func parse(id string) {
+func parse(id string) (rId, rType string) {
 	if strings.HasPrefix(id, "/") == false {
 		id = "/" + id
 	}
 	if strings.HasSuffix(id, "/") == false {
 		id = id + "/"
 	}
+
+	parts := strings.Split(id, "/")
+	l := len(parts)
+
+	if l % 2 == 0 {
+		rId = parts[l - 2]
+		rType = parts[l - 3]
+	} else {
+		rId = parts[l - 3]
+		rType = parts[l - 2]
+	}
+	return
 }
 
 
