@@ -1,4 +1,4 @@
-
+//
 // This project start as a fork of `github.com/nerdylikeme/go-documentdb` version
 // but changed a bit, and may be changed later
 //
@@ -24,7 +24,6 @@ func New(url string, config Config) *DocumentDB {
 }
 
 // TODO: Add `requestOptions` arguments
-
 // Read database by self link
 func (c *DocumentDB) ReadDatabase(link string) (db *Database, err error) {
 	err = c.client.Read(link, &db)
