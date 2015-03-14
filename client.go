@@ -14,15 +14,18 @@ type Client struct {
 	http.Client
 }
 
+// Read resource by self link
 func (c *Client) Read(link string, ret interface{}) error {
 	req, err := http.NewRequest("GET", path(c.Url, link), &bytes.Buffer{})
 	if err != nil {
 		return err
 	}
+
 	r := ResourceRequest(link, req)
 	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
 		return err
 	}
+
 	resp, err := c.Do(r.Request)
 	if err != nil {
 		return err

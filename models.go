@@ -1,4 +1,5 @@
 package documentdb
+//TODO: transform some fields to `private`
 
 // Resource
 type Resource struct {
@@ -13,7 +14,7 @@ type Resource struct {
 // TODO: Ex/IncludePaths
 type IndexingPolicy struct {
 	IndexingMode	string	`json: "indexingMode,omitempty"`
-	Automatic	string	`json: "automatic,omitempty"`
+	Automatic	bool	`json: "automatic,omitempty"`
 }
 
 // Database
@@ -27,11 +28,11 @@ type Database struct {
 type Collection struct {
 	Resource
 	IndexingPolicy	IndexingPolicy	`json:"indexingPolicy,omitempty"`
-	docs		string		`json:"_docs,omitempty"`
-	udf		string		`json:"_udf,omitempty"`
-	sporcs		string		`json:"_sporcs,omitempty"`
-	triggers	string		`json:"_triggers,omitempty"`
-	conflicts	string		`json:"_conflicts,omitempty"`
+	Docs		string		`json:"_docs,omitempty"`
+	Udf		string		`json:"_udfs,omitempty"`
+	Sporcs		string		`json:"_sporcs,omitempty"`
+	Triggers	string		`json:"_triggers,omitempty"`
+	Conflicts	string		`json:"_conflicts,omitempty"`
 }
 
 // Document

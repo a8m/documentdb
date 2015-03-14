@@ -1,8 +1,5 @@
 package documentdb
 
-import (
-)
-
 type Config struct {
 	MasterKey	string
 }
@@ -19,12 +16,16 @@ func New(url string, config Config) *DocumentDB {
 	return &DocumentDB{client}
 }
 
+// TODO: Add `requestOptions` arguments
+
 // Read database by self link
-func (c *DocumentDB) ReadDatabase(link string) (*Database, error) {
-	db := &Database{}
-	err := c.client.Read(link, db)
-	if err != nil {
-		return nil, err
-	}
-	return db, nil
+func (c *DocumentDB) ReadDatabase(link string) (db *Database, err error) {
+	err = c.client.Read(link, &db)
+	return
+}
+
+// Read collection by self link
+func (c *DocumentDB) ReadCollection(link string) (coll *Collection, err error) {
+	err = c.client.Read(link, &coll)
+	return
 }

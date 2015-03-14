@@ -10,6 +10,7 @@ import (
 const (
 	HEADER_XDATE	= "x-ms-date"
 	HEADER_AUTH 	= "authorization"
+	HEADER_VER	= "x-ms-version"
 )
 
 type Request struct {
@@ -18,14 +19,17 @@ type Request struct {
 	*http.Request
 }
 
+// Return new resource request with type and id
 func ResourceRequest(link string, req *http.Request) *Request {
 	rId, rType := parse(link)
 	return &Request{rId, rType, req}
 }
 
-func (req *Request) DefaultHeaders(mKey string) error {
+// Add 3 default headers to *Request
+// "x-ms-date", "x-ms-version", "authorization"
+func (req *Request) DefaultHeaders(mKey string) (err error) {
 	req.Header.Add(HEADER_XDATE, time.Now().UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT"))
-	req.Header.Add("x-ms-version", "2014-08-21")
+	req.Header.Add(HEADER_VER, "2014-08-21")
 
 	// Auth
 	parts := []string{req.Method, req.rType, req.rId, req.Header.Get(HEADER_XDATE), req.Header.Get("Date"), ""}
@@ -37,17 +41,11 @@ func (req *Request) DefaultHeaders(mKey string) error {
 	masterToken := "master"
 	tokenVersion := "1.0"
 	req.Header.Add(HEADER_AUTH, url.QueryEscape("type=" + masterToken + "&ver=" + tokenVersion + "&sig=" +sign))
-	return nil
+	return
 }
 
-// Response Example
-// { type: 'dbs',
-// objectBody: { id: 'b5NCAA==', self: '/dbs/b5NCAA==/' } }
-//
-// { type: 'colls',
-// objectBody: { id: 'b5NCAIu9NwA=', self: '/dbs/b5NCAA==/colls/b5NCAIu9NwA=/' } }
-//
-// Should return a type/id struct
+// Get path and return resource Id and Type
+// (e.g: "/dbs/b5NCAA==/" ==> "b5NCAA==", "dbs")
 func parse(id string) (rId, rType string) {
 	if strings.HasPrefix(id, "/") == false {
 		id = "/" + id
