@@ -15,7 +15,7 @@ type DocumentDB struct {
 	client	Clienter
 }
 
-// Create DocumentClient
+// Create DocumentDBClient
 func New(url string, config Config) *DocumentDB {
 	client := &Client{}
 	client.Url = url
