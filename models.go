@@ -1,5 +1,4 @@
 package documentdb
-//TODO: transform some fields to `private`
 
 // Resource
 type Resource struct {
