@@ -41,3 +41,9 @@ func (c *DocumentDB) ReadCollection(link string) (coll *Collection, err error) {
 	}
 	return
 }
+
+// Read document by self link
+func (c *DocumentDB) ReadDocument(link string, doc interface{}) error {
+	err := c.client.Read(link, &doc)
+	return err
+}

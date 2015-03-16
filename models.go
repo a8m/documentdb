@@ -36,7 +36,7 @@ type Collection struct {
 }
 
 // Document
-type Documents struct {
+type Document struct {
 	Resource
 	attachments	string	`json: "attachments,omitempty"`
 }
