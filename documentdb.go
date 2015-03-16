@@ -27,11 +27,17 @@ func New(url string, config Config) *DocumentDB {
 // Read database by self link
 func (c *DocumentDB) ReadDatabase(link string) (db *Database, err error) {
 	err = c.client.Read(link, &db)
+	if err != nil {
+		return nil, err
+	}
 	return
 }
 
 // Read collection by self link
 func (c *DocumentDB) ReadCollection(link string) (coll *Collection, err error) {
 	err = c.client.Read(link, &coll)
+	if err != nil {
+		return nil, err
+	}
 	return
 }

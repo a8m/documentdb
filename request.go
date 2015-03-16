@@ -1,6 +1,7 @@
 package documentdb
 
 import (
+	"fmt"
 	"strings"
 	"time"
 	"net/http"
@@ -13,6 +14,18 @@ const (
 	HEADER_VER	= "X-Ms-Version"
 )
 
+// Request Error
+type RequestError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// Implement Error function
+func (e RequestError) Error() string {
+	return fmt.Sprintf("%v, %v", e.Code, e.Message)
+}
+
+// Resource Request
 type Request struct {
 	rId	string
 	rType	string

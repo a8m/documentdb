@@ -30,20 +30,23 @@ func (c *Client) Read(link string, ret interface{}) error {
 		return err
 	}
 
-	// TODO: Move to `Do` function
+	return c.do(r, ret)
+}
+
+// Private do function, DRY
+func (c *Client) do(r *Request, data interface{}) error {
 	resp, err := c.Do(r.Request)
 	if err != nil {
 		return err
 	}
 
 	if resp.StatusCode != http.StatusOK {
+		err = &RequestError{}
 		readJson(resp.Body, &err)
-		// Return Request Error
 		return err
 	}
-
 	defer resp.Body.Close()
-	return readJson(resp.Body, ret)
+	return readJson(resp.Body, data)
 }
 
 // Generate link

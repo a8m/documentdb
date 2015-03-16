@@ -42,7 +42,7 @@ func ServerFactory(resp ...interface{}) *MockServer {
 		// Record the last request
 		s.Record(r)
 		if v, ok := resp[0].(int); ok {
-			err := fmt.Errorf("Status code %d", v)
+			err := fmt.Errorf(`{"code": "500", "message": "DocumentDB error"}`)
 			http.Error(w, err.Error(), v)
 		} else {
 			fmt.Fprintln(w, resp[0])
@@ -60,12 +60,12 @@ func TestRead(t *testing.T) {
 
 	// First call
 	var db Database
-	err := client.Read("/dbs/b5NCAA==/", &db)
+	err := client.Read("/dbs/b7NTAS==/", &db)
 	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
 	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
-	// Second Call
-	// When StatusCode != StatusOK
-	err = client.Read("/dbs/b5NCAA==/", &db)
+	// Second Call, when StatusCode != StatusOK
+	err = client.Read("/dbs/b7NCAA==/colls/Ad352/", &db)
+	assert.Equal(err.Error(), "500, DocumentDB error")
 }
