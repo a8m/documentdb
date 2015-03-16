@@ -30,7 +30,9 @@ func (c *Client) Read(link string, ret interface{}) error {
 		return err
 	}
 
+	// Move to `Do` function
 	resp, err := c.Do(r.Request)
+	// TODO: http.StatusOK ?
 	if err != nil {
 		return err
 	}
