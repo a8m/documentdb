@@ -20,22 +20,22 @@ func TestNew(t *testing.T) {
 	client := New("url", Config{"config"})
 	assert.IsType(client, &DocumentDB{}, "Should return DocumentDB object")
 }
-//
-//func TestReadDatabase(t *testing.T) {
-//	client := &ClientStub{}
-//	c := &DocumentDB{client}
-//	client.On("Read", "self_link").Return(nil)
-//	c.ReadDatabase("self_link")
-//	client.AssertCalled(t, "Read", "self_link")
-//}
-//
-//func TestReadCollection(t *testing.T) {
-//	client := &ClientStub{}
-//	c := &DocumentDB{client}
-//	client.On("Read", "self_link").Return(nil)
-//	c.ReadCollection("self_link")
-//	client.AssertCalled(t, "Read", "self_link")
-//}
+
+func TestReadDatabase(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Read", "self_link").Return(nil)
+	c.ReadDatabase("self_link")
+	client.AssertCalled(t, "Read", "self_link")
+}
+
+func TestReadCollection(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Read", "self_link").Return(nil)
+	c.ReadCollection("self_link")
+	client.AssertCalled(t, "Read", "self_link")
+}
 
 func TestReadDocument(t *testing.T) {
 	type MyDocument struct {
