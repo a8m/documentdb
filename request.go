@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	HEADER_XDATE	= "x-ms-date"
-	HEADER_AUTH 	= "authorization"
-	HEADER_VER	= "x-ms-version"
+	HEADER_XDATE	= "X-Ms-Date"
+	HEADER_AUTH 	= "Authorization"
+	HEADER_VER	= "X-Ms-Version"
 )
 
 type Request struct {

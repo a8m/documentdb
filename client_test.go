@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-//	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 // I more interested in the request, instead of the response
@@ -29,7 +29,12 @@ func (s *MockServer) Record(r *http.Request) {
 	s.Body = string(b)
 }
 
-func (s *MockServer) AssertHeaders(headers ...string)
+func (s *MockServer) AssertHeaders(t *testing.T, headers ...string) {
+	assert := assert.New(t)
+	for _, k := range headers {
+		assert.NotNil(s.Header[k])
+	}
+}
 
 func ServerFactory(resp ...interface{}) *MockServer {
 	s := &MockServer{}
@@ -48,15 +53,19 @@ func ServerFactory(resp ...interface{}) *MockServer {
 }
 
 func TestRead(t *testing.T) {
-	s := ServerFactory(`{"_self": "Id"}`, 500)
+	assert := assert.New(t)
+	s := ServerFactory(`{"_colls": "colls"}`, 500)
 	defer s.Close()
-	client := &Client{}
-	client.Url = s.URL
-	client.Config = Config{"YXJpZWwNCg=="}
-	db := &Database{}
-	client.Read("/dbs/b5NCAA==/", db)
-	defer s.Close()
-	fmt.Println(db)
-	fmt.Println(s.Header)
-	fmt.Println(s.Body)
+	client := &Client{Url:s.URL, Config:Config{"YXJpZWwNCg=="}}
+
+	// First call
+	var db Database
+	err := client.Read("/dbs/b5NCAA==/", &db)
+	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
+	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
+	assert.Nil(err, "err should be nil")
+
+	// Second Call
+	// When StatusCode != StatusOK
+	err = client.Read("/dbs/b5NCAA==/", &db)
 }
