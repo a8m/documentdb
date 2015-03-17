@@ -47,3 +47,12 @@ func (c *DocumentDB) ReadDocument(link string, doc interface{}) error {
 	err := c.client.Read(link, &doc)
 	return err
 }
+
+// Read sporc by self link
+func (c *DocumentDB) ReadStoredProcedure(link string) (sporc *Sporc, err error) {
+	err = c.client.Read(link, &sporc)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
