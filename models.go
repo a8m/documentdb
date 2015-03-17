@@ -45,3 +45,9 @@ type Sporc struct {
 	Resource
 	Body	string	`json:"body,omitempty"`
 }
+
+// User Defined Function
+type UDF struct {
+	Resource
+	Body	string	`json:"body,omitempty"`
+}
