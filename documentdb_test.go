@@ -52,3 +52,11 @@ func TestReadDocument(t *testing.T) {
 	c.ReadDocument("self_link_doc", &doc)
 	client.AssertCalled(t, "Read", "self_link_doc")
 }
+
+func TestReadStoredProcedure(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Read", "self_link").Return(nil)
+	c.ReadStoredProcedure("self_link")
+	client.AssertCalled(t, "Read", "self_link")
+}
