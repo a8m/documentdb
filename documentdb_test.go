@@ -21,6 +21,7 @@ func TestNew(t *testing.T) {
 	assert.IsType(client, &DocumentDB{}, "Should return DocumentDB object")
 }
 
+// TODO: Test failure
 func TestReadDatabase(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client}
@@ -58,5 +59,13 @@ func TestReadStoredProcedure(t *testing.T) {
 	c := &DocumentDB{client}
 	client.On("Read", "self_link").Return(nil)
 	c.ReadStoredProcedure("self_link")
+	client.AssertCalled(t, "Read", "self_link")
+}
+
+func TestReadUserDefinedFunction(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Read", "self_link").Return(nil)
+	c.ReadUserDefinedFunction("self_link")
 	client.AssertCalled(t, "Read", "self_link")
 }
