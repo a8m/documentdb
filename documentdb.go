@@ -56,3 +56,12 @@ func (c *DocumentDB) ReadStoredProcedure(link string) (sporc *Sporc, err error) 
 	}
 	return
 }
+
+// Read udf by self link
+func (c *DocumentDB) ReadUserDefinedFunction(link string) (udf *UDF, err error) {
+	err = c.client.Read(link, &udf)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
