@@ -69,3 +69,11 @@ func TestReadUserDefinedFunction(t *testing.T) {
 	c.ReadUserDefinedFunction("self_link")
 	client.AssertCalled(t, "Read", "self_link")
 }
+
+func TestReadDatabases(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Read", "dbs").Return(nil)
+	c.ReadDatabases()
+	client.AssertCalled(t, "Read", "dbs")
+}
