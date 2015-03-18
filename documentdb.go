@@ -43,9 +43,9 @@ func (c *DocumentDB) ReadCollection(link string) (coll *Collection, err error) {
 }
 
 // Read document by self link
-func (c *DocumentDB) ReadDocument(link string, doc interface{}) error {
-	err := c.client.Read(link, &doc)
-	return err
+func (c *DocumentDB) ReadDocument(link string, doc interface{}) (err error) {
+	err = c.client.Read(link, &doc)
+	return
 }
 
 // Read sporc by self link
@@ -114,9 +114,9 @@ func (c *DocumentDB) ReadStoredProcedures(coll string) (sprocs []Sproc, err erro
 // Read all udfs by collection self link
 func (c *DocumentDB) ReadUserDefinedFunctions(coll string) (udfs []UDF, err error) {
 	data := struct {
-			Udfs	[]UDF	`json:"UserDefinedFunctions,omitempty"`
-			Count	int	`json:"_count,omitempty"`
-		}{}
+		Udfs	[]UDF	`json:"UserDefinedFunctions,omitempty"`
+		Count	int	`json:"_count,omitempty"`
+	}{}
 	err = c.client.Read(coll + "udfs/", &data)
 	if err != nil {
 		udfs = nil
@@ -126,3 +126,13 @@ func (c *DocumentDB) ReadUserDefinedFunctions(coll string) (udfs []UDF, err erro
 	return
 }
 
+// Read all documents by collection self link
+// TODO: use read/query iterator
+func (c *DocumentDB) ReadDocuments(coll string, docs interface{}) (err error) {
+	data := struct {
+		Documents	interface{}	`json:"Documents,omitempty"`
+		Count		int		`json:"_count,omitempty"`
+	}{Documents: docs}
+	err = c.client.Read(coll + "docs/", &data)
+	return
+}
