@@ -49,8 +49,8 @@ func (c *DocumentDB) ReadDocument(link string, doc interface{}) error {
 }
 
 // Read sporc by self link
-func (c *DocumentDB) ReadStoredProcedure(link string) (sporc *Sporc, err error) {
-	err = c.client.Read(link, &sporc)
+func (c *DocumentDB) ReadStoredProcedure(link string) (sproc *Sproc, err error) {
+	err = c.client.Read(link, &sproc)
 	if err != nil {
 		return nil, err
 	}
@@ -84,14 +84,28 @@ func (c *DocumentDB) ReadDatabases() (dbs []Database, err error) {
 // Read all collections by db selflink
 func (c *DocumentDB) ReadCollections(db string) (colls []Collection, err error) {
 	data := struct {
-			Collections	[]Collection	`json:"DocumentCollections,omitempty"`
-			Count		int		`json:"_count,omitempty"`
+		Collections	[]Collection	`json:"DocumentCollections,omitempty"`
+		Count		int		`json:"_count,omitempty"`
 	}{}
 	err = c.client.Read(db + "colls/", &data)
 	if err != nil {
 		colls = nil
 	} else {
 		colls = data.Collections
+	}
+	return
+}
+
+func (c *DocumentDB) ReadStoredProcedures(coll string) (sprocs []Sproc, err error) {
+	data := struct {
+		Sprocs	[]Sproc	`json:"StoredProcedures,omitempty"`
+		Count	int	`json:"_count,omitempty"`
+	}{}
+	err = c.client.Read(coll + "sprocs/", &data)
+	if err != nil {
+		sprocs = nil
+	} else {
+		sprocs = data.Sprocs
 	}
 	return
 }

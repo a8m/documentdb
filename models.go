@@ -41,7 +41,7 @@ type Document struct {
 }
 
 // Stored Procedure
-type Sporc struct {
+type Sproc struct {
 	Resource
 	Body	string	`json:"body,omitempty"`
 }

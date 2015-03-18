@@ -86,3 +86,4 @@ func TestReadCollections(t *testing.T) {
 	c.ReadCollections(dbLink)
 	client.AssertCalled(t, "Read", dbLink + "colls/")
 }
+
