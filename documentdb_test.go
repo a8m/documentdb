@@ -95,3 +95,12 @@ func TestReadStoredProcedures(t *testing.T) {
 	c.ReadStoredProcedures(collLink)
 	client.AssertCalled(t, "Read", collLink + "sprocs/")
 }
+
+func TestReadUserDefinedFunctions(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	collLink := "colllink/"
+	client.On("Read", collLink + "udfs/").Return(nil)
+	c.ReadUserDefinedFunctions(collLink)
+	client.AssertCalled(t, "Read", collLink + "udfs/")
+}
