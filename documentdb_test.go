@@ -104,3 +104,12 @@ func TestReadUserDefinedFunctions(t *testing.T) {
 	c.ReadUserDefinedFunctions(collLink)
 	client.AssertCalled(t, "Read", collLink + "udfs/")
 }
+
+func TestReadDocuments(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	collLink := "colllink/"
+	client.On("Read", collLink + "docs/").Return(nil)
+	c.ReadDocuments(collLink, struct {}{})
+	client.AssertCalled(t, "Read", collLink + "docs/")
+}
