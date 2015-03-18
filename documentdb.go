@@ -65,3 +65,17 @@ func (c *DocumentDB) ReadUserDefinedFunction(link string) (udf *UDF, err error) 
 	}
 	return
 }
+
+// Read all databases
+func (c *DocumentDB) ReadDatabases() ([]Database, error) {
+	data := struct {
+		Databases	[]Database	`json:"Databases,omitempty"`
+		Count		int		`json:"_count,omitempty"`
+	}{}
+	err := c.client.Read("dbs", &data)
+	if err != nil {
+		return nil, err
+	}
+	return data.Databases, nil
+}
+

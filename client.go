@@ -33,7 +33,7 @@ func (c *Client) Read(link string, ret interface{}) error {
 	return c.do(r, ret)
 }
 
-// Private do function, DRY
+// Private Do function, DRY
 func (c *Client) do(r *Request, data interface{}) error {
 	resp, err := c.Do(r.Request)
 	if err != nil {
