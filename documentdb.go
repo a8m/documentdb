@@ -81,3 +81,17 @@ func (c *DocumentDB) ReadDatabases() (dbs []Database, err error) {
 	return
 }
 
+// Read all collections by db selflink
+func (c *DocumentDB) ReadCollections(db string) (colls []Collection, err error) {
+	data := struct {
+			Collections	[]Collection	`json:"DocumentCollections,omitempty"`
+			Count		int		`json:"_count,omitempty"`
+	}{}
+	err = c.client.Read(db + "colls/", &data)
+	if err != nil {
+		colls = nil
+	} else {
+		colls = data.Collections
+	}
+	return
+}
