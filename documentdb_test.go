@@ -77,3 +77,12 @@ func TestReadDatabases(t *testing.T) {
 	c.ReadDatabases()
 	client.AssertCalled(t, "Read", "dbs")
 }
+
+func TestReadCollections(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	dbLink := "dblink/"
+	client.On("Read", dbLink + "colls/").Return(nil)
+	c.ReadCollections(dbLink)
+	client.AssertCalled(t, "Read", dbLink + "colls/")
+}
