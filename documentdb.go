@@ -96,7 +96,7 @@ func (c *DocumentDB) ReadCollections(db string) (colls []Collection, err error) 
 	return
 }
 
-// Read all sprocs by collction self link
+// Read all sprocs by collection self link
 func (c *DocumentDB) ReadStoredProcedures(coll string) (sprocs []Sproc, err error) {
 	data := struct {
 		Sprocs	[]Sproc	`json:"StoredProcedures,omitempty"`
@@ -111,6 +111,7 @@ func (c *DocumentDB) ReadStoredProcedures(coll string) (sprocs []Sproc, err erro
 	return
 }
 
+// Read all udfs by collection self link
 func (c *DocumentDB) ReadUserDefinedFunctions(coll string) (udfs []UDF, err error) {
 	data := struct {
 			Udfs	[]UDF	`json:"UserDefinedFunctions,omitempty"`
