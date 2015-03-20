@@ -83,15 +83,7 @@ func (c *DocumentDB) ReadStoredProcedures(coll string) (sprocs []Sproc, err erro
 
 // Read all udfs by collection self link
 func (c *DocumentDB) ReadUserDefinedFunctions(coll string) (udfs []UDF, err error) {
-	data := struct {
-		Udfs	[]UDF	`json:"UserDefinedFunctions,omitempty"`
-		Count	int	`json:"_count,omitempty"`
-	}{}
-	err = c.client.Read(coll + "udfs/", &data)
-	if udfs = data.Udfs; err != nil {
-		udfs = nil
-	}
-	return
+	return c.QueryUserDefinedFunctions(coll, "")
 }
 
 // Read all documents by collection self link
@@ -152,6 +144,23 @@ func (c *DocumentDB) QueryStoredProcedures(coll, query string) (sprocs []Sproc, 
 	}
 	if sprocs = data.Sprocs; err != nil {
 		sprocs = nil
+	}
+	return
+}
+
+// Read all collection `udfs` that satisfy a query
+func (c *DocumentDB) QueryUserDefinedFunctions(coll, query string) (udfs []UDF, err error) {
+	data := struct {
+		Udfs	[]UDF	`json:"UserDefinedFunctions,omitempty"`
+		Count	int	`json:"_count,omitempty"`
+	}{}
+	if len(query) > 0 {
+		err = c.client.Query(coll + "udfs/", query, &data)
+	} else {
+		err = c.client.Read(coll + "udfs/", &data)
+	}
+	if udfs = data.Udfs; err != nil {
+		udfs = nil
 	}
 	return
 }
