@@ -150,3 +150,12 @@ func TestQueryUserDefinedFunctions(t *testing.T) {
 	c.QueryUserDefinedFunctions("colls_self_link/", "SELECT * FROM ROOT r")
 	client.AssertCalled(t, "Query", "colls_self_link/udfs/", "SELECT * FROM ROOT r")
 }
+
+func TestQueryDocuments(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	collLink := "coll_self_link/"
+	client.On("Query", collLink + "docs/", "SELECT * FROM ROOT r").Return(nil)
+	c.QueryDocuments(collLink, "SELECT * FROM ROOT r", struct {}{})
+	client.AssertCalled(t, "Query", collLink + "docs/", "SELECT * FROM ROOT r")
+}
