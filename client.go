@@ -36,7 +36,7 @@ func (c *Client) Read(link string, ret interface{}) error {
 }
 
 // Query resource
-func (c *Client) Query(link string, query string, ret interface{}) error {
+func (c *Client) Query(link, query string, ret interface{}) error {
 	buf := bytes.NewBufferString(querify(query))
 	req, err := http.NewRequest("POST", path(c.Url, link), buf)
 	if err != nil {
