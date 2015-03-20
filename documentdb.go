@@ -68,17 +68,7 @@ func (c *DocumentDB) ReadUserDefinedFunction(link string) (udf *UDF, err error) 
 
 // Read all databases
 func (c *DocumentDB) ReadDatabases() (dbs []Database, err error) {
-	data := struct {
-		Databases	[]Database	`json:"Databases,omitempty"`
-		Count		int		`json:"_count,omitempty"`
-	}{}
-	err = c.client.Read("dbs", &data)
-	if err != nil {
-		dbs = nil
-	} else {
-		dbs = data.Databases
-	}
-	return
+	return c.QueryDatabases("")
 }
 
 // Read all collections by db selflink
@@ -134,5 +124,24 @@ func (c *DocumentDB) ReadDocuments(coll string, docs interface{}) (err error) {
 		Count		int		`json:"_count,omitempty"`
 	}{Documents: docs}
 	err = c.client.Read(coll + "docs/", &data)
+	return
+}
+
+// Read all databases that satisfy a query
+func (c *DocumentDB) QueryDatabases(query string) (dbs []Database, err error) {
+	data := struct {
+		Databases	[]Database	`json:"Databases,omitempty"`
+		Count		int		`json:"_count,omitempty"`
+	}{}
+	if len(query) > 0 {
+		err = c.client.Query("dbs", query, &data)
+	} else {
+		err = c.client.Read("dbs", &data)
+	}
+	if err != nil {
+		dbs = nil
+	} else {
+		dbs = data.Databases
+	}
 	return
 }
