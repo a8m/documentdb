@@ -86,15 +86,10 @@ func (c *DocumentDB) ReadUserDefinedFunctions(coll string) (udfs []UDF, err erro
 	return c.QueryUserDefinedFunctions(coll, "")
 }
 
-// Read all documents by collection self link
-// TODO: use read/query iterator
+// Read all collection documents by self link
+// TODO: use iterator for heavy transactions
 func (c *DocumentDB) ReadDocuments(coll string, docs interface{}) (err error) {
-	data := struct {
-		Documents	interface{}	`json:"Documents,omitempty"`
-		Count		int		`json:"_count,omitempty"`
-	}{Documents: docs}
-	err = c.client.Read(coll + "docs/", &data)
-	return
+	return c.QueryDocuments(coll, "", docs)
 }
 
 // Read all databases that satisfy a query
@@ -161,6 +156,20 @@ func (c *DocumentDB) QueryUserDefinedFunctions(coll, query string) (udfs []UDF, 
 	}
 	if udfs = data.Udfs; err != nil {
 		udfs = nil
+	}
+	return
+}
+
+// Read all documents in a collection that satisfy a query
+func (c *DocumentDB) QueryDocuments(coll, query string, docs interface{}) (err error) {
+	data := struct {
+		Documents	interface{}	`json:"Documents,omitempty"`
+		Count		int		`json:"_count,omitempty"`
+	}{Documents: docs}
+	if len(query) > 0 {
+		err = c.client.Query(coll + "docs/", query, &data)
+	} else {
+		err = c.client.Read(coll + "docs/", &data)
 	}
 	return
 }
