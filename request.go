@@ -12,6 +12,9 @@ const (
 	HEADER_XDATE	= "X-Ms-Date"
 	HEADER_AUTH 	= "Authorization"
 	HEADER_VER	= "X-Ms-Version"
+	HEADER_CONTYPE	= "Content-Type"
+	HEADER_CONLEN	= "Content-Length"
+	HEADER_IS_QUERY	= "X-Ms-Documentdb-Isquery"
 )
 
 // Request Error
@@ -55,6 +58,13 @@ func (req *Request) DefaultHeaders(mKey string) (err error) {
 	tokenVersion := "1.0"
 	req.Header.Add(HEADER_AUTH, url.QueryEscape("type=" + masterToken + "&ver=" + tokenVersion + "&sig=" +sign))
 	return
+}
+
+// Add headers for query request
+func (req *Request) QueryHeaders(len int) {
+	req.Header.Add(HEADER_CONTYPE, "application/query+json")
+	req.Header.Add(HEADER_IS_QUERY, "true")
+	req.Header.Add(HEADER_CONLEN, string(len))
 }
 
 // Get path and return resource Id and Type
