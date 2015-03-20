@@ -69,3 +69,22 @@ func TestRead(t *testing.T) {
 	err = client.Read("/dbs/b7NCAA==/colls/Ad352/", &db)
 	assert.Equal(err.Error(), "500, DocumentDB error")
 }
+
+func TestQuery(t *testing.T) {
+	assert := assert.New(t)
+	s := ServerFactory(`{"_colls": "colls"}`, 500)
+	defer s.Close()
+	client := &Client{Url:s.URL, Config:Config{"YXJpZWwNCg=="}}
+
+	// First call
+	var db Database
+	err := client.Query("dbs", "SELECT * FROM ROOT r", &db)
+	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
+	s.AssertHeaders(t, HEADER_CONLEN, HEADER_CONTYPE, HEADER_IS_QUERY)
+	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
+	assert.Nil(err, "err should be nil")
+
+	// Second Call, when StatusCode != StatusOK
+	err = client.Read("/dbs/b7NCAA==/colls/Ad352/", &db)
+	assert.Equal(err.Error(), "500, DocumentDB error")
+}
