@@ -78,15 +78,7 @@ func (c *DocumentDB) ReadCollections(db string) (colls []Collection, err error) 
 
 // Read all sprocs by collection self link
 func (c *DocumentDB) ReadStoredProcedures(coll string) (sprocs []Sproc, err error) {
-	data := struct {
-		Sprocs	[]Sproc	`json:"StoredProcedures,omitempty"`
-		Count	int	`json:"_count,omitempty"`
-	}{}
-	err = c.client.Read(coll + "sprocs/", &data)
-	if sprocs = data.Sprocs; err != nil {
-		sprocs = nil
-	}
-	return
+	return c.QueryStoredProcedures(coll, "")
 }
 
 // Read all udfs by collection self link
@@ -143,6 +135,23 @@ func (c *DocumentDB) QueryCollections(db, query string) (colls []Collection, err
 	}
 	if colls = data.Collections; err != nil {
 		colls = nil
+	}
+	return
+}
+
+// Read all collection `sprocs` that satisfy a query
+func (c *DocumentDB) QueryStoredProcedures(coll, query string) (sprocs []Sproc, err error) {
+	data := struct {
+		Sprocs	[]Sproc	`json:"StoredProcedures,omitempty"`
+		Count	int	`json:"_count,omitempty"`
+	}{}
+	if len(query) > 0 {
+		err = c.client.Query(coll + "sprocs/", query, &data)
+	} else {
+		err = c.client.Read(coll + "sprocs/", &data)
+	}
+	if sprocs = data.Sprocs; err != nil {
+		sprocs = nil
 	}
 	return
 }
