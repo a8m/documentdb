@@ -142,3 +142,11 @@ func TestQueryStoredProcedures(t *testing.T) {
 	c.QueryStoredProcedures("colls_self_link/", "SELECT * FROM ROOT r")
 	client.AssertCalled(t, "Query", "colls_self_link/sprocs/", "SELECT * FROM ROOT r")
 }
+
+func TestQueryUserDefinedFunctions(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Query", "colls_self_link/udfs/", "SELECT * FROM ROOT r").Return(nil)
+	c.QueryUserDefinedFunctions("colls_self_link/", "SELECT * FROM ROOT r")
+	client.AssertCalled(t, "Query", "colls_self_link/udfs/", "SELECT * FROM ROOT r")
+}
