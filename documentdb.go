@@ -73,15 +73,7 @@ func (c *DocumentDB) ReadDatabases() (dbs []Database, err error) {
 
 // Read all collections by db selflink
 func (c *DocumentDB) ReadCollections(db string) (colls []Collection, err error) {
-	data := struct {
-		Collections	[]Collection	`json:"DocumentCollections,omitempty"`
-		Count		int		`json:"_count,omitempty"`
-	}{}
-	err = c.client.Read(db + "colls/", &data)
-	if colls = data.Collections; err != nil {
-		colls = nil
-	}
-	return
+	return c.QueryCollections(db, "")
 }
 
 // Read all sprocs by collection self link
@@ -134,6 +126,23 @@ func (c *DocumentDB) QueryDatabases(query string) (dbs []Database, err error) {
 	}
 	if dbs = data.Databases; err != nil {
 		dbs = nil
+	}
+	return
+}
+
+// Read all db-collection that satisfy a query
+func (c *DocumentDB) QueryCollections(db, query string) (colls []Collection, err error) {
+	data := struct {
+		Collections	[]Collection	`json:"DocumentCollections,omitempty"`
+		Count		int		`json:"_count,omitempty"`
+	}{}
+	if len(query) > 0 {
+		err = c.client.Query(db + "colls/", query, &data)
+	} else {
+		err = c.client.Read(db + "colls/", &data)
+	}
+	if colls = data.Collections; err != nil {
+		colls = nil
 	}
 	return
 }
