@@ -78,10 +78,8 @@ func (c *DocumentDB) ReadCollections(db string) (colls []Collection, err error) 
 		Count		int		`json:"_count,omitempty"`
 	}{}
 	err = c.client.Read(db + "colls/", &data)
-	if err != nil {
+	if colls = data.Collections; err != nil {
 		colls = nil
-	} else {
-		colls = data.Collections
 	}
 	return
 }
@@ -93,10 +91,8 @@ func (c *DocumentDB) ReadStoredProcedures(coll string) (sprocs []Sproc, err erro
 		Count	int	`json:"_count,omitempty"`
 	}{}
 	err = c.client.Read(coll + "sprocs/", &data)
-	if err != nil {
+	if sprocs = data.Sprocs; err != nil {
 		sprocs = nil
-	} else {
-		sprocs = data.Sprocs
 	}
 	return
 }
@@ -108,10 +104,8 @@ func (c *DocumentDB) ReadUserDefinedFunctions(coll string) (udfs []UDF, err erro
 		Count	int	`json:"_count,omitempty"`
 	}{}
 	err = c.client.Read(coll + "udfs/", &data)
-	if err != nil {
+	if udfs = data.Udfs; err != nil {
 		udfs = nil
-	} else {
-		udfs = data.Udfs
 	}
 	return
 }
