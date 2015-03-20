@@ -138,10 +138,8 @@ func (c *DocumentDB) QueryDatabases(query string) (dbs []Database, err error) {
 	} else {
 		err = c.client.Read("dbs", &data)
 	}
-	if err != nil {
+	if dbs = data.Databases; err != nil {
 		dbs = nil
-	} else {
-		dbs = data.Databases
 	}
 	return
 }
