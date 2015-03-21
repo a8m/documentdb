@@ -20,6 +20,11 @@ func (c *ClientStub) Query(link, query string, ret interface{}) error {
 	return nil
 }
 
+func (c *ClientStub) Create(link string, body, ret interface{}) error {
+	c.Called(link, body)
+	return nil
+}
+
 func TestNew(t *testing.T) {
 	assert := assert.New(t)
 	client := New("url", Config{"config"})
@@ -158,4 +163,12 @@ func TestQueryDocuments(t *testing.T) {
 	client.On("Query", collLink + "docs/", "SELECT * FROM ROOT r").Return(nil)
 	c.QueryDocuments(collLink, "SELECT * FROM ROOT r", struct {}{})
 	client.AssertCalled(t, "Query", collLink + "docs/", "SELECT * FROM ROOT r")
+}
+
+func TestCreateDatabase(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Create", "dbs", "{}").Return(nil)
+	c.CreateDatabase("{}")
+	client.AssertCalled(t, "Create", "dbs", "{}")
 }
