@@ -1,6 +1,6 @@
 //
 // This project start as a fork of `github.com/nerdylikeme/go-documentdb` version
-// but changed a bit, and may be changed later
+// but changed, and may be changed later
 //
 // Goal: add the full functionality of documentdb, align with the other sdks
 // and make it more testable
@@ -171,5 +171,11 @@ func (c *DocumentDB) QueryDocuments(coll, query string, docs interface{}) (err e
 	} else {
 		err = c.client.Read(coll + "docs/", &data)
 	}
+	return
+}
+
+// Create database
+func (c *DocumentDB) CreateDatabase(body interface{}) (db *Database, err error) {
+	err = c.client.Create("dbs", body, &db)
 	return
 }
