@@ -196,3 +196,12 @@ func TestCreateUserDefinedFunction(t *testing.T) {
 	c.CreateUserDefinedFunction("dbs/colls/", `{"id":"fn"}`)
 	client.AssertCalled(t, "Create", "dbs/colls/udfs/", `{"id":"fn"}`)
 }
+
+func TestCreateDocument(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	// TODO: test error situation, without id, etc...
+	client.On("Create", "dbs/colls/docs/", `{"id":"documentId"}`).Return(nil)
+	c.CreateDocument("dbs/colls/", `{"id":"documentId"}`)
+	client.AssertCalled(t, "Create", "dbs/colls/docs/", `{"id":"documentId"}`)
+}
