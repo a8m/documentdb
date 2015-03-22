@@ -188,3 +188,11 @@ func TestCreateStoredProcedure(t *testing.T) {
 	c.CreateStoredProcedure("dbs/colls/", `{"id":"fn"}`)
 	client.AssertCalled(t, "Create", "dbs/colls/sprocs/", `{"id":"fn"}`)
 }
+
+func TestCreateUserDefinedFunction(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Create", "dbs/colls/udfs/", `{"id":"fn"}`).Return(nil)
+	c.CreateUserDefinedFunction("dbs/colls/", `{"id":"fn"}`)
+	client.AssertCalled(t, "Create", "dbs/colls/udfs/", `{"id":"fn"}`)
+}
