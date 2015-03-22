@@ -180,3 +180,11 @@ func TestCreateCollection(t *testing.T) {
 	c.CreateCollection("dbs/", "{}")
 	client.AssertCalled(t, "Create", "dbs/colls/", "{}")
 }
+
+func TestCreateStoredProcedure(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Create", "dbs/colls/sprocs/", `{"id":"fn"}`).Return(nil)
+	c.CreateStoredProcedure("dbs/colls/", `{"id":"fn"}`)
+	client.AssertCalled(t, "Create", "dbs/colls/sprocs/", `{"id":"fn"}`)
+}
