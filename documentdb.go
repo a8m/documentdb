@@ -177,5 +177,17 @@ func (c *DocumentDB) QueryDocuments(coll, query string, docs interface{}) (err e
 // Create database
 func (c *DocumentDB) CreateDatabase(body interface{}) (db *Database, err error) {
 	err = c.client.Create("dbs", body, &db)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
+// Create collection
+func (c *DocumentDB) CreateCollection(db string, body interface{}) (coll *Collection, err error) {
+	err = c.client.Create(db + "colls/", body, &coll)
+	if err != nil {
+		return nil, err
+	}
 	return
 }
