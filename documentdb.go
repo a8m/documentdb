@@ -191,3 +191,12 @@ func (c *DocumentDB) CreateCollection(db string, body interface{}) (coll *Collec
 	}
 	return
 }
+
+// Create stored procedure
+func (c *DocumentDB) CreateStoredProcedure(coll string, body interface{}) (sproc *Sproc, err error) {
+	err = c.client.Create(coll + "sprocs/", body, &sproc)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
