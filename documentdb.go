@@ -200,3 +200,12 @@ func (c *DocumentDB) CreateStoredProcedure(coll string, body interface{}) (sproc
 	}
 	return
 }
+
+// Create user defined function
+func (c *DocumentDB) CreateUserDefinedFunction(coll string, body interface{}) (udf *UDF, err error) {
+	err = c.client.Create(coll + "udfs/", body, &udf)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
