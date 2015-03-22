@@ -209,3 +209,8 @@ func (c *DocumentDB) CreateUserDefinedFunction(coll string, body interface{}) (u
 	}
 	return
 }
+
+// Create document
+func (c *DocumentDB) CreateDocument(coll string, doc interface{}) error {
+	return c.client.Create(coll + "docs/", doc, &doc)
+}
