@@ -172,3 +172,11 @@ func TestCreateDatabase(t *testing.T) {
 	c.CreateDatabase("{}")
 	client.AssertCalled(t, "Create", "dbs", "{}")
 }
+
+func TestCreateCollection(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Create", "dbs/colls/", "{}").Return(nil)
+	c.CreateCollection("dbs/", "{}")
+	client.AssertCalled(t, "Create", "dbs/colls/", "{}")
+}
