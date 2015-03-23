@@ -211,18 +211,19 @@ func TestCreateDocument(t *testing.T) {
 	client.AssertCalled(t, "Create", "dbs/colls/docs/", `{"id":"documentId"}`)
 }
 
-func TestDeleteDatabase(t *testing.T) {
+func TestDeleteResource(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client}
-	client.On("Delete", "self_link").Return(nil)
-	c.DeleteDatabase("self_link")
-	client.AssertCalled(t, "Delete", "self_link")
-}
 
-func TestDeleteCollection(t *testing.T) {
-	client := &ClientStub{}
-	c := &DocumentDB{client}
-	client.On("Delete", "self_link").Return(nil)
-	c.DeleteCollection("self_link")
-	client.AssertCalled(t, "Delete", "self_link")
+	client.On("Delete", "self_link_db").Return(nil)
+	c.DeleteDatabase("self_link_db")
+	client.AssertCalled(t, "Delete", "self_link_db")
+
+	client.On("Delete", "self_link_coll").Return(nil)
+	c.DeleteCollection("self_link_coll")
+	client.AssertCalled(t, "Delete", "self_link_coll")
+
+	client.On("Delete", "self_link_doc").Return(nil)
+	c.DeleteDocument("self_link_doc")
+	client.AssertCalled(t, "Delete", "self_link_doc")
 }

@@ -225,3 +225,8 @@ func (c *DocumentDB) DeleteDatabase(link string) error {
 func (c *DocumentDB) DeleteCollection(link string) error {
 	return c.client.Delete(link)
 }
+
+// Delete collection
+func (c *DocumentDB) DeleteDocument(link string) error {
+	return c.client.Delete(link)
+}
