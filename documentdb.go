@@ -214,3 +214,8 @@ func (c *DocumentDB) CreateUserDefinedFunction(coll string, body interface{}) (u
 func (c *DocumentDB) CreateDocument(coll string, doc interface{}) error {
 	return c.client.Create(coll + "docs/", doc, &doc)
 }
+
+// Delete database
+func (c *DocumentDB) DeleteDatabase(link string) error {
+	return c.client.Delete(link)
+}
