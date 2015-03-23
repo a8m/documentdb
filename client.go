@@ -54,15 +54,7 @@ func (c *Client) Create(link string, body, ret interface{}) error {
 		return err
 	}
 	buf := bytes.NewBuffer(data)
-	req, err := http.NewRequest("POST", path(c.Url, link), buf)
-	if err != nil {
-		return err
-	}
-	r := ResourceRequest(link, req)
-	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
-		return err
-	}
-	return c.do(r, http.StatusCreated, ret)
+	return c.method("POST", link, http.StatusCreated, ret, buf)
 }
 
 // Generic method resource
