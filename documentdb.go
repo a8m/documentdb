@@ -215,7 +215,7 @@ func (c *DocumentDB) CreateDocument(coll string, doc interface{}) error {
 	return c.client.Create(coll + "docs/", doc, &doc)
 }
 
-// TODO: DRY, but the sdk ask that
+// TODO: DRY, but the sdk want that[mm.. maybe just client.Delete(self_link)]
 // Delete database
 func (c *DocumentDB) DeleteDatabase(link string) error {
 	return c.client.Delete(link)
@@ -228,5 +228,10 @@ func (c *DocumentDB) DeleteCollection(link string) error {
 
 // Delete collection
 func (c *DocumentDB) DeleteDocument(link string) error {
+	return c.client.Delete(link)
+}
+
+// Delete stored procedure
+func(c *DocumentDB) DeleteStoredProcedure(link string) error {
 	return c.client.Delete(link)
 }
