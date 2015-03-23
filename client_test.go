@@ -18,6 +18,11 @@ type RequestRecorder struct {
 type MockServer struct {
 	*httptest.Server
 	RequestRecorder
+	Status	interface{}
+}
+
+func (m *MockServer) SetStatus(status int) {
+	m.Status = status
 }
 
 func (s *MockServer) Record(r *http.Request) {
@@ -45,6 +50,9 @@ func ServerFactory(resp ...interface{}) *MockServer {
 			err := fmt.Errorf(`{"code": "500", "message": "DocumentDB error"}`)
 			http.Error(w, err.Error(), v)
 		} else {
+			if status, ok := s.Status.(int); ok {
+				w.WriteHeader(status)
+			}
 			fmt.Fprintln(w, resp[0])
 		}
 		resp = resp[1:]
@@ -92,6 +100,7 @@ func TestQuery(t *testing.T) {
 func TestCreate(t *testing.T) {
 	assert := assert.New(t)
 	s := ServerFactory(`{"_colls": "colls"}`, `{"id": "9"}`, 500)
+	s.SetStatus(http.StatusCreated)
 	defer s.Close()
 	client := &Client{Url:s.URL, Config:Config{"YXJpZWwNCg=="}}
 
@@ -112,5 +121,22 @@ func TestCreate(t *testing.T) {
 
 	// Last Call, when StatusCode != StatusOK && StatusCreated
 	err = client.Create("dbs", tDoc, &doc)
+	assert.Equal(err.Error(), "500, DocumentDB error")
+}
+
+func TestDelete(t *testing.T) {
+	assert := assert.New(t)
+	s := ServerFactory(`10`, 500)
+	s.SetStatus(http.StatusNoContent)
+	defer s.Close()
+	client := &Client{Url:s.URL, Config:Config{"YXJpZWwNCg=="}}
+
+	// First call
+	err := client.Delete("/dbs/b7NTAS==/")
+	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
+	assert.Nil(err, "err should be nil")
+
+	// Second Call, when StatusCode != StatusOK
+	err = client.Delete("/dbs/b7NCAA==/colls/Ad352/")
 	assert.Equal(err.Error(), "500, DocumentDB error")
 }
