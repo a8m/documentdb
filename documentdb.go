@@ -215,7 +215,13 @@ func (c *DocumentDB) CreateDocument(coll string, doc interface{}) error {
 	return c.client.Create(coll + "docs/", doc, &doc)
 }
 
+// TODO: DRY, but the sdk ask that
 // Delete database
 func (c *DocumentDB) DeleteDatabase(link string) error {
+	return c.client.Delete(link)
+}
+
+// Delete collection
+func (c *DocumentDB) DeleteCollection(link string) error {
 	return c.client.Delete(link)
 }
