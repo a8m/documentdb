@@ -235,3 +235,8 @@ func (c *DocumentDB) DeleteDocument(link string) error {
 func(c *DocumentDB) DeleteStoredProcedure(link string) error {
 	return c.client.Delete(link)
 }
+
+// Delete user defined function
+func(c *DocumentDB) DeleteUserDefinedFunction(link string) error {
+	return c.client.Delete(link)
+}
