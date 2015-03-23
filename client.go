@@ -24,12 +24,12 @@ type Client struct {
 
 // Read resource by self link
 func (c *Client) Read(link string, ret interface{}) error {
-	return c.method("GET", link, http.StatusOK, ret)
+	return c.method("GET", link, http.StatusOK, ret, &bytes.Buffer{})
 }
 
 // Delete resource by self link
 func (c *Client) Delete(link string) error {
-	return c.method("DELETE", link, http.StatusNoContent, nil)
+	return c.method("DELETE", link, http.StatusNoContent, nil, &bytes.Buffer{})
 }
 
 // Query resource
@@ -65,9 +65,9 @@ func (c *Client) Create(link string, body, ret interface{}) error {
 	return c.do(r, http.StatusCreated, ret)
 }
 
-// Delete resource
-func (c *Client) method(method, link string, status int, ret interface{}) (err error) {
-	req, err := http.NewRequest(method, path(c.Url, link), &bytes.Buffer{})
+// Generic method resource
+func (c *Client) method(method, link string, status int, ret interface{}, body *bytes.Buffer) (err error) {
+	req, err := http.NewRequest(method, path(c.Url, link), body)
 	if err != nil {
 		return err
 	}
