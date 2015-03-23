@@ -25,6 +25,11 @@ func (c *ClientStub) Create(link string, body, ret interface{}) error {
 	return nil
 }
 
+func (c *ClientStub) Delete(link string) error {
+	c.Called(link)
+	return nil
+}
+
 func TestNew(t *testing.T) {
 	assert := assert.New(t)
 	client := New("url", Config{"config"})
@@ -204,4 +209,12 @@ func TestCreateDocument(t *testing.T) {
 	client.On("Create", "dbs/colls/docs/", `{"id":"documentId"}`).Return(nil)
 	c.CreateDocument("dbs/colls/", `{"id":"documentId"}`)
 	client.AssertCalled(t, "Create", "dbs/colls/docs/", `{"id":"documentId"}`)
+}
+
+func TestDeleteDatabase(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Delete", "self_link").Return(nil)
+	c.DeleteDatabase("self_link")
+	client.AssertCalled(t, "Delete", "self_link")
 }
