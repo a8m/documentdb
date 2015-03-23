@@ -11,6 +11,7 @@ import (
 
 type Clienter interface {
 	Read(link string, ret interface{}) error
+	Delete(link string) error
 	Query(link string, query string, ret interface{}) error
 	Create(link string, body, ret interface{}) error
 }
@@ -23,15 +24,12 @@ type Client struct {
 
 // Read resource by self link
 func (c *Client) Read(link string, ret interface{}) error {
-	req, err := http.NewRequest("GET", path(c.Url, link), &bytes.Buffer{})
-	if err != nil {
-		return err
-	}
-	r := ResourceRequest(link, req)
-	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
-		return err
-	}
-	return c.do(r, ret)
+	return c.method("GET", link, http.StatusOK, ret)
+}
+
+// Delete resource by self link
+func (c *Client) Delete(link string) error {
+	return c.method("DELETE", link, http.StatusNoContent, nil)
 }
 
 // Query resource
@@ -46,7 +44,7 @@ func (c *Client) Query(link, query string, ret interface{}) error {
 		return err
 	}
 	r.QueryHeaders(buf.Len())
-	return c.do(r, ret)
+	return c.do(r, http.StatusOK, ret)
 }
 
 // Create resource
@@ -64,21 +62,37 @@ func (c *Client) Create(link string, body, ret interface{}) error {
 	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
 		return err
 	}
-	return c.do(r, ret)
+	return c.do(r, http.StatusCreated, ret)
+}
+
+// Delete resource
+func (c *Client) method(method, link string, status int, ret interface{}) (err error) {
+	req, err := http.NewRequest(method, path(c.Url, link), &bytes.Buffer{})
+	if err != nil {
+		return err
+	}
+	r := ResourceRequest(link, req)
+	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
+		return err
+	}
+	return c.do(r, status, ret)
 }
 
 // Private Do function, DRY
-func (c *Client) do(r *Request, data interface{}) error {
+func (c *Client) do(r *Request, status int, data interface{}) error {
 	resp, err := c.Do(r.Request)
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+	if resp.StatusCode != status {
 		err = &RequestError{}
 		readJson(resp.Body, &err)
 		return err
 	}
 	defer resp.Body.Close()
+	if data == nil  {
+		return nil
+	}
 	return readJson(resp.Body, data)
 }
 
