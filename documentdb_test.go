@@ -218,3 +218,11 @@ func TestDeleteDatabase(t *testing.T) {
 	c.DeleteDatabase("self_link")
 	client.AssertCalled(t, "Delete", "self_link")
 }
+
+func TestDeleteCollection(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Delete", "self_link").Return(nil)
+	c.DeleteCollection("self_link")
+	client.AssertCalled(t, "Delete", "self_link")
+}
