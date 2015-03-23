@@ -226,4 +226,8 @@ func TestDeleteResource(t *testing.T) {
 	client.On("Delete", "self_link_doc").Return(nil)
 	c.DeleteDocument("self_link_doc")
 	client.AssertCalled(t, "Delete", "self_link_doc")
+
+	client.On("Delete", "self_link_sproc").Return(nil)
+	c.DeleteDocument("self_link_sproc")
+	client.AssertCalled(t, "Delete", "self_link_sproc")
 }
