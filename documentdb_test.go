@@ -30,6 +30,11 @@ func (c *ClientStub) Delete(link string) error {
 	return nil
 }
 
+func (c *ClientStub) Replace(link string, body, ret interface{}) error {
+	c.Called(link, body)
+	return nil
+}
+
 func TestNew(t *testing.T) {
 	assert := assert.New(t)
 	client := New("url", Config{"config"})
@@ -234,4 +239,12 @@ func TestDeleteResource(t *testing.T) {
 	client.On("Delete", "self_link_udf").Return(nil)
 	c.DeleteDocument("self_link_udf")
 	client.AssertCalled(t, "Delete", "self_link_udf")
+}
+
+func TestReplaceDatabase(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Replace", "db_link", "{}").Return(nil)
+	c.ReplaceDatabase("db_link", "{}")
+	client.AssertCalled(t, "Replace", "db_link", "{}")
 }
