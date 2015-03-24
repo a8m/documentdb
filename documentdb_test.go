@@ -256,3 +256,11 @@ func TestReplaceDocument(t *testing.T) {
 	c.ReplaceDocument("doc_link", "{}")
 	client.AssertCalled(t, "Replace", "doc_link", "{}")
 }
+
+func TestReplaceStoredProcedure(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Replace", "sproc_link", "{}").Return(nil)
+	c.ReplaceStoredProcedure("sproc_link", "{}")
+	client.AssertCalled(t, "Replace", "sproc_link", "{}")
+}
