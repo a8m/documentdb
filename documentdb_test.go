@@ -262,5 +262,13 @@ func TestReplaceStoredProcedure(t *testing.T) {
 	c := &DocumentDB{client}
 	client.On("Replace", "sproc_link", "{}").Return(nil)
 	c.ReplaceStoredProcedure("sproc_link", "{}")
-	client.AssertCalled(t, "Replace", "sproc_link", "{}")
+	client.AssertCalled(t, "Replace", "sproc_lreink", "{}")
+}
+
+func TestReplaceUserDefinedFunction(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Replace", "udf_link", "{}").Return(nil)
+	c.ReplaceUserDefinedFunction("udf_link", "{}")
+	client.AssertCalled(t, "Replace", "udf_link", "{}")
 }
