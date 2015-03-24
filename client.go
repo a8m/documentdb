@@ -14,6 +14,7 @@ type Clienter interface {
 	Delete(link string) error
 	Query(link string, query string, ret interface{}) error
 	Create(link string, body, ret interface{}) error
+	Replace(link string, body, ret interface{}) error
 }
 
 type Client struct {
@@ -57,7 +58,17 @@ func (c *Client) Create(link string, body, ret interface{}) error {
 	return c.method("POST", link, http.StatusCreated, ret, buf)
 }
 
-// Generic method resource
+// Replace resource
+func (c *Client) Replace(link string, body, ret interface{}) error {
+	data, err := stringify(body)
+	if err != nil {
+		return err
+	}
+	buf := bytes.NewBuffer(data)
+	return c.method("PUT", link, http.StatusOK, ret, buf)
+}
+
+// Private generic method resource
 func (c *Client) method(method, link string, status int, ret interface{}, body *bytes.Buffer) (err error) {
 	req, err := http.NewRequest(method, path(c.Url, link), body)
 	if err != nil {
