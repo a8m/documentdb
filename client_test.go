@@ -140,3 +140,30 @@ func TestDelete(t *testing.T) {
 	err = client.Delete("/dbs/b7NCAA==/colls/Ad352/")
 	assert.Equal(err.Error(), "500, DocumentDB error")
 }
+
+func TestReplace(t *testing.T) {
+	assert := assert.New(t)
+	s := ServerFactory(`{"_colls": "colls"}`, `{"id": "9"}`, 500)
+	s.SetStatus(http.StatusOK)
+	defer s.Close()
+	client := &Client{Url:s.URL, Config:Config{"YXJpZWwNCg=="}}
+
+	// First call
+	var db Database
+	err := client.Replace("dbs", `{"id": 3}`, &db)
+	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
+	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
+	assert.Nil(err, "err should be nil")
+
+	// Second call
+	var doc, tDoc Document
+	tDoc.Id = "9"
+	err = client.Replace("dbs", tDoc, &doc)
+	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
+	assert.Equal(doc.Id, "9", "Should fill the fields from response body")
+	assert.Nil(err, "err should be nil")
+
+	// Last Call, when StatusCode != StatusOK && StatusCreated
+	err = client.Replace("dbs", tDoc, &doc)
+	assert.Equal(err.Error(), "500, DocumentDB error")
+}
