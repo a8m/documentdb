@@ -249,3 +249,8 @@ func (c *DocumentDB) ReplaceDatabase(link string, body interface{}) (db *Databas
 	}
 	return
 }
+
+// Replace document
+func (c *DocumentDB) ReplaceDocument(link string, doc interface{}) error {
+	return c.client.Replace(link, doc, &doc)
+}
