@@ -232,11 +232,20 @@ func (c *DocumentDB) DeleteDocument(link string) error {
 }
 
 // Delete stored procedure
-func(c *DocumentDB) DeleteStoredProcedure(link string) error {
+func (c *DocumentDB) DeleteStoredProcedure(link string) error {
 	return c.client.Delete(link)
 }
 
 // Delete user defined function
-func(c *DocumentDB) DeleteUserDefinedFunction(link string) error {
+func (c *DocumentDB) DeleteUserDefinedFunction(link string) error {
 	return c.client.Delete(link)
+}
+
+// Replace database
+func (c *DocumentDB) ReplaceDatabase(link string, body interface{}) (db *Database, err error) {
+	err = c.client.Replace(link, body, &db)
+	if err != nil {
+		return nil, err
+	}
+	return
 }
