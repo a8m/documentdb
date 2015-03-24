@@ -255,9 +255,18 @@ func (c *DocumentDB) ReplaceDocument(link string, doc interface{}) error {
 	return c.client.Replace(link, doc, &doc)
 }
 
-// Replace database
+// Replace stored procedure
 func (c *DocumentDB) ReplaceStoredProcedure(link string, body interface{}) (sproc *Sproc, err error) {
 	err = c.client.Replace(link, body, &sproc)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
+// Replace stored procedure
+func (c *DocumentDB) ReplaceUserDefinedFunction(link string, body interface{}) (udf *UDF, err error) {
+	err = c.client.Replace(link, body, &udf)
 	if err != nil {
 		return nil, err
 	}
