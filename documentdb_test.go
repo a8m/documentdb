@@ -248,3 +248,11 @@ func TestReplaceDatabase(t *testing.T) {
 	c.ReplaceDatabase("db_link", "{}")
 	client.AssertCalled(t, "Replace", "db_link", "{}")
 }
+
+func TestReplaceDocument(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Replace", "doc_link", "{}").Return(nil)
+	c.ReplaceDocument("doc_link", "{}")
+	client.AssertCalled(t, "Replace", "doc_link", "{}")
+}
