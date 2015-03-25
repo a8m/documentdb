@@ -64,5 +64,263 @@ func main() {
 }
 ```
 
-### MIT license.
+### Databases
+#### ReadDatabase
+```go
+func main() {
+	// ...
+	db, err := client.ReadDatabase("self_link")
+	if err != nil {
+		log.Fatal(err)	
+	}
+	fmt.Println(db.Self, db.Id)
+}
+```
+#### QueryDatabases
+```go
+func main() {
+	// ...
+	dbs, err := client.QueryDatabases("SELECT * FROM ROOT r")
+	if err != nil {
+		log.Fatal(err)	
+	}
+	for _, db := range dbs {
+		fmt.Println("DB Name:", db.Id)
+	}
+}
+```
+#### ReadDatabases
+```go
+func main() {
+	// ...
+	dbs, err := client.ReadDatabases()
+	if err != nil {
+		log.Fatal(err)	
+	}
+	for _, db := range dbs {
+		fmt.Println("DB Name:", db.Id)
+	}
+}
+```
+#### CreateDatabase
+```go
+func main() {
+	// ...
+	db, err := client.CreateDatabase(`{ "id": "test" }`)
+	if err != nil {
+		log.Fatal(err)	
+	}
+	fmt.Println(db)
+	
+	// or ...
+	var db documentdb.Database
+	db, err = client.CreateDatabase(&db)
+}
+```
+#### ReplaceDatabase
+```go
+func main() {
+	// ...
+	db, err := client.ReplaceDatabase("self_link", `{ "id": "test" }`)
+	if err != nil {
+		log.Fatal(err)	
+	}
+	fmt.Println(db)
+	
+	// or ...
+	var db documentdb.Database
+	db, err = client.ReplaceDatabase("self_link", &db)
+}
+```
+#### DeleteDatabase
+```go
+func main() {
+	// ...
+	err := client.DeleteDatabase("self_link")
+	if err != nil {
+		log.Fatal(err)	
+	}
+}
+```
+
+### Collections
+#### ReadCollection
+```go
+func main() {
+	// ...
+	coll, err := client.ReadCollection("self_link")
+	if err != nil {
+		log.Fatal(err)	
+	}
+	fmt.Println(coll.Self, coll.Id)
+}
+```
+#### QueryCollections
+```go
+func main() {
+	// ...
+	colls, err := client.QueryCollections("db_self_link", "SELECT * FROM ROOT r")
+	if err != nil {
+		log.Fatal(err)	
+	}
+	for _, coll := range colls {
+		fmt.Println("Collection Name:", coll.Id)
+	}
+}
+```
+#### ReadCollections
+```go
+func main() {
+	// ...
+	colls, err := client.ReadCollections("db_self_link")
+	if err != nil {
+		log.Fatal(err)	
+	}
+	for _, coll := range colls {
+		fmt.Println("Collection Name:", coll.Id)
+	}
+}
+```
+#### CreateCollection
+```go
+func main() {
+	// ...
+	coll, err := client.CreateCollection("db_self_link", `{"id": "my_test"}`)
+	if err != nil {
+		log.Fatal(err)	
+	}
+	fmt.Println("Collection Name:", coll.Id)
+	
+	// or ...
+	var coll documentdb.Collection
+	coll, err = client.CreateCollection("db_self_link", &coll)
+}
+```
+#### DeleteCollection
+```go
+func main() {
+	// ...
+	err := client.DeleteCollection("self_link")
+	if err != nil {
+		log.Fatal(err)	
+	}
+}
+```
+### Documents
+#### ReadDocument
+```go
+type Document struct {
+	documentdb.Document
+	// Your external fields
+	Name    string `json:"name,omitempty"`
+	Email   string `json:"email,omitempty"`
+}
+
+func main() {
+	// ...
+	var doc Document
+	err = client.ReadDocument("self_link", &doc)
+	if err != nil {
+		log.Fatal(err)	
+	}
+	fmt.Println("Document Name:", doc.Name)
+}
+```
+#### QueryDocuments
+```go
+type User struct {
+	documentdb.Document
+	// Your external fields
+	Name    string `json:"name,omitempty"`
+	Email   string `json:"email,omitempty"`
+}
+
+func main() {
+	// ...
+	var users []User
+	err = client.QueryDocuments("coll_self_link", "SELECT * FROM ROOT r", &users)
+	if err != nil {
+		log.Fatal(err)	
+	}
+	for _, user := range users {
+		fmt.Print("Name:", user.Name, "Email:", user.Email)
+	}
+}
+```
+#### ReadDocuments
+```go
+type User struct {
+	documentdb.Document
+	// Your external fields
+	Name    string `json:"name,omitempty"`
+	Email   string `json:"email,omitempty"`
+}
+
+func main() {
+	// ...
+	var users []User
+	err = client.ReadDocuments("coll_self_link", &users)
+	if err != nil {
+		log.Fatal(err)	
+	}
+	for _, user := range users {
+		fmt.Print("Name:", user.Name, "Email:", user.Email)
+	}
+}
+```
+#### CreateDocument
+```go
+type User struct {
+	documentdb.Document
+	// Your external fields
+	Name    string `json:"name,omitempty"`
+	Email   string `json:"email,omitempty"`
+}
+
+func main() {
+	// ...
+	var user User
+	user.Id = "uuid"
+	user.Name = "Ariel"
+	user.Email = "ariel@test.com"
+	err := client.CreateDocument("coll_self_link", &doc)
+	if err != nil {
+		log.Fatal(err)	
+	}
+	fmt.Print("Name:", user.Name, "Email:", user.Email)
+}
+```
+#### ReplaceDocument
+```go
+type User struct {
+	documentdb.Document
+	// Your external fields
+	IsAdmin bool   `json:"isAdmin,omitempty"`
+}
+
+func main() {
+	// ...
+	var user User
+	user.Id = "uuid"
+	user.IsAdmin = false
+	err := client.ReplaceDocument("doc_self_link", &user)
+	if err != nil {
+		log.Fatal(err)	
+	}
+	fmt.Print("Is Admin:", user.IsAdmin)
+}
+```
+#### DeleteDocument
+```go
+func main() {
+	// ...
+	err := client.DeleteDocument("doc_self_link")
+	if err != nil {
+		log.Fatal(err)	
+	}
+}
+```
+
+
+### MIT license
 
