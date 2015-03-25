@@ -114,6 +114,7 @@ func main() {
 	
 	// or ...
 	var db documentdb.Database
+	db.Id = "test"
 	db, err = client.CreateDatabase(&db)
 }
 ```
@@ -193,6 +194,7 @@ func main() {
 	
 	// or ...
 	var coll documentdb.Collection
+	coll.Id = "test"
 	coll, err = client.CreateCollection("db_self_link", &coll)
 }
 ```
