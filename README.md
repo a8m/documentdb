@@ -282,7 +282,7 @@ type User struct {
 func main() {
 	// ...
 	var user User
-	user.Id = "uuid"
+	user.Id = "uuid" // If the id is missing in the payload it will generate random document id
 	user.Name = "Ariel"
 	user.Email = "ariel@test.com"
 	err := client.CreateDocument("coll_self_link", &doc)
