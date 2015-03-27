@@ -211,9 +211,11 @@ func TestCreateDocument(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client}
 	// TODO: test error situation, without id, etc...
-	client.On("Create", "dbs/colls/docs/", `{"id":"documentId"}`).Return(nil)
-	c.CreateDocument("dbs/colls/", `{"id":"documentId"}`)
-	client.AssertCalled(t, "Create", "dbs/colls/docs/", `{"id":"documentId"}`)
+	var doc Document
+	client.On("Create", "dbs/colls/docs/", &doc).Return(nil)
+	c.CreateDocument("dbs/colls/", &doc)
+	client.AssertCalled(t, "Create", "dbs/colls/docs/", &doc)
+	assert.NotEqual(t, doc.Id, "")
 }
 
 func TestDeleteResource(t *testing.T) {
@@ -262,7 +264,7 @@ func TestReplaceStoredProcedure(t *testing.T) {
 	c := &DocumentDB{client}
 	client.On("Replace", "sproc_link", "{}").Return(nil)
 	c.ReplaceStoredProcedure("sproc_link", "{}")
-	client.AssertCalled(t, "Replace", "sproc_lreink", "{}")
+	client.AssertCalled(t, "Replace", "sproc_link", "{}")
 }
 
 func TestReplaceUserDefinedFunction(t *testing.T) {

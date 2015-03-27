@@ -7,6 +7,8 @@
 //
 package documentdb
 
+import "reflect"
+
 type Config struct {
 	MasterKey	string
 }
@@ -212,6 +214,10 @@ func (c *DocumentDB) CreateUserDefinedFunction(coll string, body interface{}) (u
 
 // Create document
 func (c *DocumentDB) CreateDocument(coll string, doc interface{}) error {
+	id := reflect.ValueOf(doc).Elem().FieldByName("Id")
+	if id.IsValid() && id.String() == "" {
+		id.SetString(uuid())
+	}
 	return c.client.Create(coll + "docs/", doc, &doc)
 }
 
