@@ -30,8 +30,7 @@ func (e RequestError) Error() string {
 
 // Resource Request
 type Request struct {
-	rId	string
-	rType	string
+	rId, rType	string
 	*http.Request
 }
 
