@@ -1,4 +1,4 @@
-## DocumentDB Go
+## DocumentDB Go  [![Build status][travis-image]][travis-url]
 > Go driver for Microsoft Azure DocumentDB 
 
 ### Note
@@ -324,5 +324,9 @@ func main() {
 ```
 
 
-### MIT license
+### License
+MIT
+
+[travis-image]: https://img.shields.io/travis/a8m/documentdb-go.svg?style=flat-square
+[travis-url]: https://travis-ci.org/a8m/documentdb-go
 
