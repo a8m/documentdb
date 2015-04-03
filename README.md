@@ -7,6 +7,7 @@ I'm doing it on my spare time and hope to stabilize it soon. if you want to cont
 
 ## Table of contents:
 - [Get Started](#get-started)
+- [Examples](#examples)
 - [Databases](#databases)
   - [Get](#readdatabase)
   - [Query](#querydatabases)
@@ -323,6 +324,8 @@ func main() {
 }
 ```
 
+### Examples
+- [Go DocumentDB Example](https://github.com/a8m/go-documentdb-example) - A users CRUD application using Martini and DocumentDB
 
 ### License
 MIT
