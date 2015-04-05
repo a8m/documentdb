@@ -70,6 +70,7 @@ func (c *Client) Replace(link string, body, ret interface{}) error {
 }
 
 // Replace resource
+// TODO: DRY, move to methods instead of actions(POST, PUT, ...)
 func (c *Client) Execute(link string, body, ret interface{}) error {
 	data, err := stringify(body)
 	if err != nil {
