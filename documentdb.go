@@ -278,3 +278,9 @@ func (c *DocumentDB) ReplaceUserDefinedFunction(link string, body interface{}) (
 	}
 	return
 }
+
+// Execute stored procedure
+func (c *DocumentDB) ExecuteStoredProcedure(link string, params, body interface{}) (err error) {
+	err = c.client.Execute(link, params, &body)
+	return
+}

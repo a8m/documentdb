@@ -15,6 +15,7 @@ type Clienter interface {
 	Query(link string, query string, ret interface{}) error
 	Create(link string, body, ret interface{}) error
 	Replace(link string, body, ret interface{}) error
+	Execute(link string, body, ret interface{}) error
 }
 
 type Client struct {
@@ -66,6 +67,16 @@ func (c *Client) Replace(link string, body, ret interface{}) error {
 	}
 	buf := bytes.NewBuffer(data)
 	return c.method("PUT", link, http.StatusOK, ret, buf)
+}
+
+// Replace resource
+func (c *Client) Execute(link string, body, ret interface{}) error {
+	data, err := stringify(body)
+	if err != nil {
+		return err
+	}
+	buf := bytes.NewBuffer(data)
+	return c.method("POST", link, http.StatusOK, ret, buf)
 }
 
 // Private generic method resource

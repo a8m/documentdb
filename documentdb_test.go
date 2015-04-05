@@ -35,6 +35,11 @@ func (c *ClientStub) Replace(link string, body, ret interface{}) error {
 	return nil
 }
 
+func (c *ClientStub) Execute(link string, body, ret interface{}) error {
+	c.Called(link, body)
+	return nil
+}
+
 func TestNew(t *testing.T) {
 	assert := assert.New(t)
 	client := New("url", Config{"config"})
