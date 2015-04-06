@@ -279,3 +279,11 @@ func TestReplaceUserDefinedFunction(t *testing.T) {
 	c.ReplaceUserDefinedFunction("udf_link", "{}")
 	client.AssertCalled(t, "Replace", "udf_link", "{}")
 }
+
+func TestExecuteStoredProcedure(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Execute", "sproc_link", "{}").Return(nil)
+	c.ExecuteStoredProcedure("sproc_link", "{}", struct{}{})
+	client.AssertCalled(t, "Execute", "sproc_link", "{}")
+}
