@@ -3,7 +3,7 @@
 
 ### Note
 This is a **WIP** project.  
-I'm doing it on my spare time and hope to stabilize it soon. if you want to contribute, feel free to take some task [here](https://github.com/a8m/documentdb-go/issues/1)
+I'm doing it on my spare time and hope to stabilize it soon. if you want to contribute, feel free to take some task [here](https://github.com/a8m/documentdb-go/issues/3)
 
 ## Table of contents:
 - [Get Started](#get-started)
