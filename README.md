@@ -35,6 +35,7 @@ I'm doing it on my spare time and hope to stabilize it soon. if you want to cont
   - [Create](#createstoredprocedure)
   - [Replace](#replacestoredprocedure)
   - [Delete](#deletestoredprocedure)
+  - [Execute](#executestoredprocedure)
 - [UserDefinedFunctions](#userdefinedfunctions)
   - [Get](#readuserdefinedfunction)
   - [Query](#queryuserdefinedfunctions)
@@ -321,6 +322,19 @@ func main() {
 	if err != nil {
 		log.Fatal(err)	
 	}
+}
+```
+###
+#### ExecuteStoredProcedure
+```go
+func main() {
+	// ...
+	var docs []Document
+	err := client.ExecuteStoredProcedure("sporc_self", [...]interface{}{p1, p2}, &docs)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// ...
 }
 ```
 
