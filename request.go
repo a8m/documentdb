@@ -44,7 +44,7 @@ func ResourceRequest(link string, req *http.Request) *Request {
 // "x-ms-date", "x-ms-version", "authorization"
 func (req *Request) DefaultHeaders(mKey string) (err error) {
 	req.Header.Add(HEADER_XDATE, time.Now().UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT"))
-	req.Header.Add(HEADER_VER, "2014-08-21")
+	req.Header.Add(HEADER_VER, "2017-02-22")
 
 	// Auth
 	parts := []string{req.Method, req.rType, req.rId, req.Header.Get(HEADER_XDATE), req.Header.Get("Date"), ""}
