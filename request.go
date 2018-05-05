@@ -2,19 +2,20 @@ package documentdb
 
 import (
 	"fmt"
-	"strings"
-	"time"
 	"net/http"
 	"net/url"
+	"strings"
+	"time"
 )
 
 const (
-	HEADER_XDATE	= "X-Ms-Date"
-	HEADER_AUTH 	= "Authorization"
-	HEADER_VER	= "X-Ms-Version"
-	HEADER_CONTYPE	= "Content-Type"
-	HEADER_CONLEN	= "Content-Length"
-	HEADER_IS_QUERY	= "X-Ms-Documentdb-Isquery"
+	HEADER_XDATE    = "X-Ms-Date"
+	HEADER_AUTH     = "Authorization"
+	HEADER_VER      = "X-Ms-Version"
+	HEADER_CONTYPE  = "Content-Type"
+	HEADER_CONLEN   = "Content-Length"
+	HEADER_IS_QUERY = "X-Ms-Documentdb-Isquery"
+	HEADER_UPSERT   = "x-ms-documentdb-is-upsert"
 )
 
 // Request Error
@@ -30,7 +31,7 @@ func (e RequestError) Error() string {
 
 // Resource Request
 type Request struct {
-	rId, rType	string
+	rId, rType string
 	*http.Request
 }
 
@@ -55,7 +56,17 @@ func (req *Request) DefaultHeaders(mKey string) (err error) {
 
 	masterToken := "master"
 	tokenVersion := "1.0"
-	req.Header.Add(HEADER_AUTH, url.QueryEscape("type=" + masterToken + "&ver=" + tokenVersion + "&sig=" +sign))
+	req.Header.Add(HEADER_AUTH, url.QueryEscape("type="+masterToken+"&ver="+tokenVersion+"&sig="+sign))
+	return
+}
+
+// UpsertHeaders just add a header for upsert with DefaultHeaders
+func (req *Request) UpsertHeaders(mkey string) (err error) {
+	err = req.DefaultHeaders(mkey)
+	if err != nil {
+		return err
+	}
+	req.Header.Add(HEADER_UPSERT, "true")
 	return
 }
 
@@ -79,14 +90,12 @@ func parse(id string) (rId, rType string) {
 	parts := strings.Split(id, "/")
 	l := len(parts)
 
-	if l % 2 == 0 {
-		rId = parts[l - 2]
-		rType = parts[l - 3]
+	if l%2 == 0 {
+		rId = parts[l-2]
+		rType = parts[l-3]
 	} else {
-		rId = parts[l - 3]
-		rType = parts[l - 2]
+		rId = parts[l-3]
+		rType = parts[l-2]
 	}
 	return
 }
-
-

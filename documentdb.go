@@ -10,11 +10,11 @@ package documentdb
 import "reflect"
 
 type Config struct {
-	MasterKey	string
+	MasterKey string
 }
 
 type DocumentDB struct {
-	client	Clienter
+	client Clienter
 }
 
 // Create DocumentDBClient
@@ -97,8 +97,8 @@ func (c *DocumentDB) ReadDocuments(coll string, docs interface{}) (err error) {
 // Read all databases that satisfy a query
 func (c *DocumentDB) QueryDatabases(query string) (dbs []Database, err error) {
 	data := struct {
-		Databases	[]Database	`json:"Databases,omitempty"`
-		Count		int		`json:"_count,omitempty"`
+		Databases []Database `json:"Databases,omitempty"`
+		Count     int        `json:"_count,omitempty"`
 	}{}
 	if len(query) > 0 {
 		err = c.client.Query("dbs", query, &data)
@@ -114,13 +114,13 @@ func (c *DocumentDB) QueryDatabases(query string) (dbs []Database, err error) {
 // Read all db-collection that satisfy a query
 func (c *DocumentDB) QueryCollections(db, query string) (colls []Collection, err error) {
 	data := struct {
-		Collections	[]Collection	`json:"DocumentCollections,omitempty"`
-		Count		int		`json:"_count,omitempty"`
+		Collections []Collection `json:"DocumentCollections,omitempty"`
+		Count       int          `json:"_count,omitempty"`
 	}{}
 	if len(query) > 0 {
-		err = c.client.Query(db + "colls/", query, &data)
+		err = c.client.Query(db+"colls/", query, &data)
 	} else {
-		err = c.client.Read(db + "colls/", &data)
+		err = c.client.Read(db+"colls/", &data)
 	}
 	if colls = data.Collections; err != nil {
 		colls = nil
@@ -131,13 +131,13 @@ func (c *DocumentDB) QueryCollections(db, query string) (colls []Collection, err
 // Read all collection `sprocs` that satisfy a query
 func (c *DocumentDB) QueryStoredProcedures(coll, query string) (sprocs []Sproc, err error) {
 	data := struct {
-		Sprocs	[]Sproc	`json:"StoredProcedures,omitempty"`
-		Count	int	`json:"_count,omitempty"`
+		Sprocs []Sproc `json:"StoredProcedures,omitempty"`
+		Count  int     `json:"_count,omitempty"`
 	}{}
 	if len(query) > 0 {
-		err = c.client.Query(coll + "sprocs/", query, &data)
+		err = c.client.Query(coll+"sprocs/", query, &data)
 	} else {
-		err = c.client.Read(coll + "sprocs/", &data)
+		err = c.client.Read(coll+"sprocs/", &data)
 	}
 	if sprocs = data.Sprocs; err != nil {
 		sprocs = nil
@@ -148,13 +148,13 @@ func (c *DocumentDB) QueryStoredProcedures(coll, query string) (sprocs []Sproc, 
 // Read all collection `udfs` that satisfy a query
 func (c *DocumentDB) QueryUserDefinedFunctions(coll, query string) (udfs []UDF, err error) {
 	data := struct {
-		Udfs	[]UDF	`json:"UserDefinedFunctions,omitempty"`
-		Count	int	`json:"_count,omitempty"`
+		Udfs  []UDF `json:"UserDefinedFunctions,omitempty"`
+		Count int   `json:"_count,omitempty"`
 	}{}
 	if len(query) > 0 {
-		err = c.client.Query(coll + "udfs/", query, &data)
+		err = c.client.Query(coll+"udfs/", query, &data)
 	} else {
-		err = c.client.Read(coll + "udfs/", &data)
+		err = c.client.Read(coll+"udfs/", &data)
 	}
 	if udfs = data.Udfs; err != nil {
 		udfs = nil
@@ -165,13 +165,13 @@ func (c *DocumentDB) QueryUserDefinedFunctions(coll, query string) (udfs []UDF, 
 // Read all documents in a collection that satisfy a query
 func (c *DocumentDB) QueryDocuments(coll, query string, docs interface{}) (err error) {
 	data := struct {
-		Documents	interface{}	`json:"Documents,omitempty"`
-		Count		int		`json:"_count,omitempty"`
+		Documents interface{} `json:"Documents,omitempty"`
+		Count     int         `json:"_count,omitempty"`
 	}{Documents: docs}
 	if len(query) > 0 {
-		err = c.client.Query(coll + "docs/", query, &data)
+		err = c.client.Query(coll+"docs/", query, &data)
 	} else {
-		err = c.client.Read(coll + "docs/", &data)
+		err = c.client.Read(coll+"docs/", &data)
 	}
 	return
 }
@@ -187,7 +187,7 @@ func (c *DocumentDB) CreateDatabase(body interface{}) (db *Database, err error) 
 
 // Create collection
 func (c *DocumentDB) CreateCollection(db string, body interface{}) (coll *Collection, err error) {
-	err = c.client.Create(db + "colls/", body, &coll)
+	err = c.client.Create(db+"colls/", body, &coll)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +196,7 @@ func (c *DocumentDB) CreateCollection(db string, body interface{}) (coll *Collec
 
 // Create stored procedure
 func (c *DocumentDB) CreateStoredProcedure(coll string, body interface{}) (sproc *Sproc, err error) {
-	err = c.client.Create(coll + "sprocs/", body, &sproc)
+	err = c.client.Create(coll+"sprocs/", body, &sproc)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +205,7 @@ func (c *DocumentDB) CreateStoredProcedure(coll string, body interface{}) (sproc
 
 // Create user defined function
 func (c *DocumentDB) CreateUserDefinedFunction(coll string, body interface{}) (udf *UDF, err error) {
-	err = c.client.Create(coll + "udfs/", body, &udf)
+	err = c.client.Create(coll+"udfs/", body, &udf)
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +218,16 @@ func (c *DocumentDB) CreateDocument(coll string, doc interface{}) error {
 	if id.IsValid() && id.String() == "" {
 		id.SetString(uuid())
 	}
-	return c.client.Create(coll + "docs/", doc, &doc)
+	return c.client.Create(coll+"docs/", doc, &doc)
+}
+
+// Upsert document
+func (c *DocumentDB) UpsertDocument(coll string, doc interface{}) error {
+	id := reflect.ValueOf(doc).Elem().FieldByName("Id")
+	if id.IsValid() && id.String() == "" {
+		id.SetString(uuid())
+	}
+	return c.client.Upsert(coll+"docs/", doc, &doc)
 }
 
 // TODO: DRY, but the sdk want that[mm.. maybe just client.Delete(self_link)]

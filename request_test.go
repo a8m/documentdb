@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"net/http"
 	"testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,4 +24,16 @@ func TestDefaultHeaders(t *testing.T) {
 	assert.NotEqual(req.Header.Get(HEADER_AUTH), "")
 	assert.NotEqual(req.Header.Get(HEADER_XDATE), "")
 	assert.NotEqual(req.Header.Get(HEADER_VER), "")
+}
+
+func TestUpsertHeaders(t *testing.T) {
+	r, _ := http.NewRequest("POST", "link", &bytes.Buffer{})
+	req := ResourceRequest("/dbs/b5NCAA==/", r)
+	_ = req.UpsertHeaders("YXJpZWwNCg==")
+
+	assert := assert.New(t)
+	assert.NotEqual(req.Header.Get(HEADER_AUTH), "")
+	assert.NotEqual(req.Header.Get(HEADER_XDATE), "")
+	assert.NotEqual(req.Header.Get(HEADER_VER), "")
+	assert.Equal(req.Header.Get(HEADER_UPSERT), "true")
 }

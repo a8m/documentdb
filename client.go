@@ -1,12 +1,12 @@
 package documentdb
 
 import (
-	"encoding/json"
-	"strings"
-	"net/http"
 	"bytes"
-	"io"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"strings"
 )
 
 type Clienter interface {
@@ -14,13 +14,14 @@ type Clienter interface {
 	Delete(link string) error
 	Query(link string, query string, ret interface{}) error
 	Create(link string, body, ret interface{}) error
+	Upsert(link string, body, ret interface{}) error
 	Replace(link string, body, ret interface{}) error
 	Execute(link string, body, ret interface{}) error
 }
 
 type Client struct {
-	Url	string
-	Config	Config
+	Url    string
+	Config Config
 	http.Client
 }
 
@@ -59,6 +60,16 @@ func (c *Client) Create(link string, body, ret interface{}) error {
 	return c.method("POST", link, http.StatusCreated, ret, buf)
 }
 
+// Upsert resource
+func (c *Client) Upsert(link string, body, ret interface{}) error {
+	data, err := stringify(body)
+	if err != nil {
+		return err
+	}
+	buf := bytes.NewBuffer(data)
+	return c.methodWithUpsert("POST", link, http.StatusCreated, ret, buf)
+}
+
 // Replace resource
 func (c *Client) Replace(link string, body, ret interface{}) error {
 	data, err := stringify(body)
@@ -93,6 +104,19 @@ func (c *Client) method(method, link string, status int, ret interface{}, body *
 	return c.do(r, status, ret)
 }
 
+// method for upsert
+func (c *Client) methodWithUpsert(method, link string, status int, ret interface{}, body *bytes.Buffer) (err error) {
+	req, err := http.NewRequest(method, path(c.Url, link), body)
+	if err != nil {
+		return err
+	}
+	r := ResourceRequest(link, req)
+	if err = r.UpsertHeaders(c.Config.MasterKey); err != nil {
+		return err
+	}
+	return c.do(r, status, ret)
+}
+
 // Private Do function, DRY
 func (c *Client) do(r *Request, status int, data interface{}) error {
 	resp, err := c.Do(r.Request)
@@ -105,7 +129,7 @@ func (c *Client) do(r *Request, status int, data interface{}) error {
 		return err
 	}
 	defer resp.Body.Close()
-	if data == nil  {
+	if data == nil {
 		return nil
 	}
 	return readJson(resp.Body, data)
@@ -131,9 +155,12 @@ func querify(query string) string {
 // Stringify body data
 func stringify(body interface{}) (bt []byte, err error) {
 	switch t := body.(type) {
-	case string: bt = []byte(t)
-	case []byte: bt = t
-	default: bt, err = json.Marshal(t)
+	case string:
+		bt = []byte(t)
+	case []byte:
+		bt = t
+	default:
+		bt, err = json.Marshal(t)
 	}
 	return
 }
