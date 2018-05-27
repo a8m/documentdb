@@ -59,7 +59,7 @@ func main() {
 	client := documentdb.New("connection-url", documentdb.Config{"master-key"})
 	// Start using DocumentDB
 	dbs, err := client.ReadDatabases()
-	if err != nill {
+	if err != nil {
 	  log.Fatal(err)
 	}
 	fmt.Println(dbs)
