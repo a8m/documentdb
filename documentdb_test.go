@@ -1,6 +1,7 @@
 package documentdb
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,8 +13,8 @@ type ClientStub struct {
 }
 
 func (c *ClientStub) Read(link string, ret interface{}) error {
-	c.Called(link)
-	return nil
+	args := c.Called(link)
+	return args.Error(0)
 }
 
 func (c *ClientStub) Query(link, query string, ret interface{}) error {
@@ -52,7 +53,15 @@ func TestNew(t *testing.T) {
 	assert.IsType(client, &DocumentDB{}, "Should return DocumentDB object")
 }
 
-// TODO: Test failure
+func TestReadDatabaseFailure(t *testing.T) {
+	client := &ClientStub{}
+	c := &DocumentDB{client}
+	client.On("Read", "self_link").Return(errors.New("couldn't read database"))
+	db, err := c.ReadDatabase("self_link")
+	assert.Nil(t, db)
+	assert.EqualError(t, err, "couldn't read database")
+}
+
 func TestReadDatabase(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client}
