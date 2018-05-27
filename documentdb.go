@@ -9,6 +9,10 @@ package documentdb
 
 import "reflect"
 
+type RequestOptions struct {
+	PartitionKey []string
+}
+
 type Config struct {
 	MasterKey string
 }
@@ -172,6 +176,29 @@ func (c *DocumentDB) QueryDocuments(coll, query string, docs interface{}) (err e
 		err = c.client.Query(coll+"docs/", query, &data)
 	} else {
 		err = c.client.Read(coll+"docs/", &data)
+	}
+	return
+}
+
+// Read all documents in a collection that satisfy a query and with request options
+func (c *DocumentDB) QueryDocumentsWithRequestOptions(coll, query string, docs interface{}, requestOptions ...func(*RequestOptions)) (err error) {
+	data := struct {
+		Documents interface{} `json:"Documents,omitempty"`
+		Count     int         `json:"_count,omitempty"`
+	}{Documents: docs}
+	// If there are request options
+	if len(requestOptions) > 0 {
+		if len(query) > 0 {
+			err = c.client.QueryWithRequestOptions(coll+"docs/", query, &data, requestOptions)
+		} else {
+			err = c.client.ReadWithRequestOptions(coll+"docs/", &data, requestOptions)
+		}
+	} else {
+		if len(query) > 0 {
+			err = c.client.Query(coll+"docs/", query, &data)
+		} else {
+			err = c.client.Read(coll+"docs/", &data)
+		}
 	}
 	return
 }

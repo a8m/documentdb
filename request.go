@@ -9,13 +9,14 @@ import (
 )
 
 const (
-	HEADER_XDATE    = "X-Ms-Date"
-	HEADER_AUTH     = "Authorization"
-	HEADER_VER      = "X-Ms-Version"
-	HEADER_CONTYPE  = "Content-Type"
-	HEADER_CONLEN   = "Content-Length"
-	HEADER_IS_QUERY = "X-Ms-Documentdb-Isquery"
-	HEADER_UPSERT   = "x-ms-documentdb-is-upsert"
+	HEADER_XDATE         = "X-Ms-Date"
+	HEADER_AUTH          = "Authorization"
+	HEADER_VER           = "X-Ms-Version"
+	HEADER_CONTYPE       = "Content-Type"
+	HEADER_CONLEN        = "Content-Length"
+	HEADER_IS_QUERY      = "X-Ms-Documentdb-Isquery"
+	HEADER_UPSERT        = "x-ms-documentdb-is-upsert"
+	HEADER_PARTITION_KEY = "x-ms-documentdb-partitionkey"
 )
 
 // Request Error
@@ -67,6 +68,31 @@ func (req *Request) UpsertHeaders(mkey string) (err error) {
 		return err
 	}
 	req.Header.Add(HEADER_UPSERT, "true")
+	return
+}
+
+// Add Request Options headers
+func (req *Request) RequestOptionsHeaders(requestOptions []func(*RequestOptions)) (err error) {
+
+	if requestOptions == nil {
+		return
+	}
+
+	reqOpts := RequestOptions{}
+
+	for _, requestOption := range requestOptions {
+		requestOption(&reqOpts)
+	}
+
+	if reqOpts.PartitionKey[0] != "" {
+		// The partition key header must be an array following the spec:
+		// https: //docs.microsoft.com/en-us/rest/api/cosmos-db/common-cosmosdb-rest-request-headers
+		// and must contain brackets
+		// example: x-ms-documentdb-partitionkey: [ "abc" ]
+
+		partitionKey := fmt.Sprintf("[\"%s\"]", reqOpts.PartitionKey[0])
+		req.Header[HEADER_PARTITION_KEY] = []string{partitionKey}
+	}
 	return
 }
 

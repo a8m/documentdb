@@ -11,8 +11,10 @@ import (
 
 type Clienter interface {
 	Read(link string, ret interface{}) error
+	ReadWithRequestOptions(link string, ret interface{}, requestOptions []func(*RequestOptions)) error
 	Delete(link string) error
 	Query(link string, query string, ret interface{}) error
+	QueryWithRequestOptions(link string, query string, ret interface{}, requestOptions []func(*RequestOptions)) error
 	Create(link string, body, ret interface{}) error
 	Upsert(link string, body, ret interface{}) error
 	Replace(link string, body, ret interface{}) error
@@ -30,6 +32,22 @@ func (c *Client) Read(link string, ret interface{}) error {
 	return c.method("GET", link, http.StatusOK, ret, &bytes.Buffer{})
 }
 
+// Read resource by self link and with request options
+func (c *Client) ReadWithRequestOptions(link string, ret interface{}, requestOptions []func(*RequestOptions)) error {
+	req, err := http.NewRequest("GET", path(c.Url, link), &bytes.Buffer{})
+	if err != nil {
+		return err
+	}
+	r := ResourceRequest(link, req)
+	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
+		return err
+	}
+	if err = r.RequestOptionsHeaders(requestOptions); err != nil {
+		return err
+	}
+	return c.do(r, http.StatusOK, ret)
+}
+
 // Delete resource by self link
 func (c *Client) Delete(link string) error {
 	return c.method("DELETE", link, http.StatusNoContent, nil, &bytes.Buffer{})
@@ -44,6 +62,24 @@ func (c *Client) Query(link, query string, ret interface{}) error {
 	}
 	r := ResourceRequest(link, req)
 	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
+		return err
+	}
+	r.QueryHeaders(buf.Len())
+	return c.do(r, http.StatusOK, ret)
+}
+
+// Query resource with request options
+func (c *Client) QueryWithRequestOptions(link, query string, ret interface{}, requestOptions []func(*RequestOptions)) error {
+	buf := bytes.NewBufferString(querify(query))
+	req, err := http.NewRequest("POST", path(c.Url, link), buf)
+	if err != nil {
+		return err
+	}
+	r := ResourceRequest(link, req)
+	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
+		return err
+	}
+	if err = r.RequestOptionsHeaders(requestOptions); err != nil {
 		return err
 	}
 	r.QueryHeaders(buf.Len())
