@@ -17,8 +17,18 @@ func (c *ClientStub) Read(link string, ret interface{}) error {
 	return args.Error(0)
 }
 
+func (c *ClientStub) ReadWithRequestOptions(link string, ret interface{}, requestOptions []func(*RequestOptions)) error {
+	c.Called(link, requestOptions)
+	return nil
+}
+
 func (c *ClientStub) Query(link, query string, ret interface{}) error {
 	c.Called(link, query)
+	return nil
+}
+
+func (c *ClientStub) QueryWithRequestOptions(link, query string, ret interface{}, requestOptions []func(*RequestOptions)) error {
+	c.Called(link, query, requestOptions)
 	return nil
 }
 
