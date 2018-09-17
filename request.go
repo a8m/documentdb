@@ -1,10 +1,10 @@
 package documentdb
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -90,15 +90,21 @@ func (req *Request) RequestOptionsHeaders(requestOptions []func(*RequestOptions)
 		// https: //docs.microsoft.com/en-us/rest/api/cosmos-db/common-cosmosdb-rest-request-headers
 		// and must contain brackets
 		// example: x-ms-documentdb-partitionkey: [ "abc" ]
-		i, err := strconv.Atoi(reqOpts.PartitionKey)
-		if err == nil {
-			partitionKey := fmt.Sprintf("[%v]", i)
-			req.Header[HEADER_PARTITION_KEY] = []string{partitionKey}
-			return nil
+
+		var partitionKey []byte
+		var err error
+		switch v := reqOpts.PartitionKey.(type) {
+		case json.Marshaler:
+			partitionKey, err = json.Marshal(v)
+		default:
+			partitionKey, err = json.Marshal([]interface{}{v})
 		}
 
-		partitionKey := fmt.Sprintf("[%v]", reqOpts.PartitionKey)
-		req.Header[HEADER_PARTITION_KEY] = []string{partitionKey}
+		if err != nil {
+			return err
+		}
+
+		req.Header[HEADER_PARTITION_KEY] = []string{string(partitionKey)}
 	}
 	return
 }
