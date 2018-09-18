@@ -106,7 +106,7 @@ func (req *Request) RequestOptionsHeaders(requestOptions []func(*RequestOptions)
 			return err
 		}
 
-		req.Header.Set(HEADER_PARTITION_KEY, string(partitionKey))
+		req.Header[HEADER_PARTITION_KEY] = []string{string(partitionKey)}
 	}
 	return
 }
