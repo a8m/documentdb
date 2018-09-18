@@ -91,8 +91,10 @@ func (req *Request) RequestOptionsHeaders(requestOptions []func(*RequestOptions)
 		// and must contain brackets
 		// example: x-ms-documentdb-partitionkey: [ "abc" ]
 
-		var partitionKey []byte
-		var err error
+		var (
+			partitionKey []byte
+			err          error
+		)
 		switch v := reqOpts.PartitionKey.(type) {
 		case json.Marshaler:
 			partitionKey, err = json.Marshal(v)
@@ -104,7 +106,7 @@ func (req *Request) RequestOptionsHeaders(requestOptions []func(*RequestOptions)
 			return err
 		}
 
-		req.Header[HEADER_PARTITION_KEY] = []string{string(partitionKey)}
+		req.Header.Set(HEADER_PARTITION_KEY, string(partitionKey))
 	}
 	return
 }
