@@ -10,7 +10,7 @@ package documentdb
 import "reflect"
 
 type RequestOptions struct {
-	PartitionKey []string
+	PartitionKey interface{}
 }
 
 type Config struct {
