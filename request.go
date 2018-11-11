@@ -1,7 +1,7 @@
 package documentdb
 
 import (
-	"encoding/json"
+	"bytes"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -10,14 +10,21 @@ import (
 )
 
 const (
-	HEADER_XDATE         = "X-Ms-Date"
-	HEADER_AUTH          = "Authorization"
-	HEADER_VER           = "X-Ms-Version"
-	HEADER_CONTYPE       = "Content-Type"
-	HEADER_CONLEN        = "Content-Length"
-	HEADER_IS_QUERY      = "X-Ms-Documentdb-Isquery"
-	HEADER_UPSERT        = "x-ms-documentdb-is-upsert"
-	HEADER_PARTITION_KEY = "x-ms-documentdb-partitionkey"
+	HEADER_XDATE          = "X-Ms-Date"
+	HEADER_AUTH           = "Authorization"
+	HEADER_VER            = "X-Ms-Version"
+	HEADER_CONTYPE        = "Content-Type"
+	HEADER_CONLEN         = "Content-Length"
+	HEADER_IS_QUERY       = "X-Ms-Documentdb-Isquery"
+	HEADER_UPSERT         = "x-ms-documentdb-is-upsert"
+	HEADER_PARTITION_KEY  = "x-ms-documentdb-partitionkey"
+	HEADER_MAX_ITEM_COUNT = "x-ms-max-item-count"
+	HEADER_CONTINUATION   = "x-ms-continuation"
+	HEADER_CONSISTENCY    = "x-ms-consistency-level"
+	HEADER_SESSION    = "x-ms-session-token"
+	HEADER_CROSSPARTITION    = "x-ms-documentdb-query-enablecrosspartitions"
+
+	SupportedVersion = "2017-02-22"
 )
 
 // Request Error
@@ -38,8 +45,8 @@ type Request struct {
 }
 
 // Return new resource request with type and id
-func ResourceRequest(link string, req *http.Request) *Request {
-	rId, rType := parse(link)
+func ResourceRequest(link Link, req *http.Request) *Request {
+	rId, rType := parse(req.URL.Path)
 	return &Request{rId, rType, req}
 }
 
@@ -47,67 +54,27 @@ func ResourceRequest(link string, req *http.Request) *Request {
 // "x-ms-date", "x-ms-version", "authorization"
 func (req *Request) DefaultHeaders(mKey string) (err error) {
 	req.Header.Add(HEADER_XDATE, time.Now().UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT"))
-	req.Header.Add(HEADER_VER, "2017-02-22")
+	req.Header.Add(HEADER_VER, SupportedVersion)
 
-	// Auth
-	parts := []string{req.Method, req.rType, req.rId, req.Header.Get(HEADER_XDATE), req.Header.Get("Date"), ""}
-	sign, err := authorize(strings.ToLower(strings.Join(parts, "\n")), mKey)
+	b := bytes.Buffer{}
+	b.WriteString(req.Method)
+	b.WriteRune('\n')
+	b.WriteString(req.rType)
+	b.WriteRune('\n')
+	b.WriteString(req.rId)
+	b.WriteRune('\n')
+	b.WriteString(req.Header.Get(HEADER_XDATE))
+	b.WriteRune('\n')
+	b.WriteString(req.Header.Get("Date"))
+	b.WriteRune('\n')
+
+	sign, err := authorize(bytes.ToLower(b.Bytes()), mKey)
 	if err != nil {
 		return err
 	}
 
-	masterToken := "master"
-	tokenVersion := "1.0"
-	req.Header.Add(HEADER_AUTH, url.QueryEscape("type="+masterToken+"&ver="+tokenVersion+"&sig="+sign))
-	return
-}
+	req.Header.Add(HEADER_AUTH, url.QueryEscape("type=master&ver=1.0&sig="+sign))
 
-// UpsertHeaders just add a header for upsert with DefaultHeaders
-func (req *Request) UpsertHeaders(mkey string) (err error) {
-	err = req.DefaultHeaders(mkey)
-	if err != nil {
-		return err
-	}
-	req.Header.Add(HEADER_UPSERT, "true")
-	return
-}
-
-// Add Request Options headers
-func (req *Request) RequestOptionsHeaders(requestOptions []func(*RequestOptions)) (err error) {
-
-	if requestOptions == nil {
-		return
-	}
-
-	reqOpts := RequestOptions{}
-
-	for _, requestOption := range requestOptions {
-		requestOption(&reqOpts)
-	}
-
-	if reqOpts.PartitionKey != "" {
-		// The partition key header must be an array following the spec:
-		// https: //docs.microsoft.com/en-us/rest/api/cosmos-db/common-cosmosdb-rest-request-headers
-		// and must contain brackets
-		// example: x-ms-documentdb-partitionkey: [ "abc" ]
-
-		var (
-			partitionKey []byte
-			err          error
-		)
-		switch v := reqOpts.PartitionKey.(type) {
-		case json.Marshaler:
-			partitionKey, err = json.Marshal(v)
-		default:
-			partitionKey, err = json.Marshal([]interface{}{v})
-		}
-
-		if err != nil {
-			return err
-		}
-
-		req.Header[HEADER_PARTITION_KEY] = []string{string(partitionKey)}
-	}
 	return
 }
 
@@ -118,8 +85,6 @@ func (req *Request) QueryHeaders(len int) {
 	req.Header.Add(HEADER_CONLEN, string(len))
 }
 
-// Get path and return resource Id and Type
-// (e.g: "/dbs/b5NCAA==/" ==> "b5NCAA==", "dbs")
 func parse(id string) (rId, rType string) {
 	if strings.HasPrefix(id, "/") == false {
 		id = "/" + id
@@ -129,7 +94,7 @@ func parse(id string) (rId, rType string) {
 	}
 
 	parts := strings.Split(id, "/")
-	l := len(parts)
+	l := len(parts) // 4
 
 	if l%2 == 0 {
 		rId = parts[l-2]
@@ -140,3 +105,37 @@ func parse(id string) (rId, rType string) {
 	}
 	return
 }
+
+// // Get path and return resource Id and Type
+// // (e.g: "/dbs/b5NCAA==/" ==> "b5NCAA==", "dbs")
+// func parse(link Link) (rId, rType string) {
+
+// 	fmt.Println("parse:", link)
+
+// 	l := len(link) // 4
+
+// 	if l == 1 {
+// 		rType = link[0]
+// 	} else {
+
+// 		if l%2 == 0 {
+// 			rId = link[l-1]
+// 			rType = link[l-2]
+// 		} else {
+// 			rId = link[l-2]
+// 			rType = link[l-1]
+// 		}
+// 	}
+// 	l = len(rId)
+// 	if l > 0 && rId[l-1] == '/' {
+// 		rId = rId[0 : l-1]
+// 	}
+// 	l = len(rType)
+// 	if rType[l-1] == '/' {
+// 		rType = rType[0 : l-1]
+// 	}
+// 	if rType[0] == '/' {
+// 		rType = rType[1:]
+// 	}
+// 	return
+// }

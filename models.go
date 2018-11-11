@@ -1,53 +1,92 @@
 package documentdb
 
+import (
+	"bytes"
+)
+
 // Resource
 type Resource struct {
-	Id	string	`json:"id,omitempty"`
-	Self	string	`json:"_self,omitempty"`
-	Etag	string	`json:"_etag,omitempty"`
-	Rid	string	`json:"_rid,omitempty"`
-	Ts	int	`json:"_ts,omitempty"`
+	Id   string `json:"id,omitempty"`
+	Self string `json:"_self,omitempty"`
+	Etag string `json:"_etag,omitempty"`
+	Rid  string `json:"_rid,omitempty"`
+	Ts   int    `json:"_ts,omitempty"`
 }
 
 // Indexing policy
 // TODO: Ex/IncludePaths
 type IndexingPolicy struct {
-	IndexingMode	string	`json: "indexingMode,omitempty"`
-	Automatic	bool	`json: "automatic,omitempty"`
+	IndexingMode string `json: "indexingMode,omitempty"`
+	Automatic    bool   `json: "automatic,omitempty"`
 }
 
 // Database
 type Database struct {
 	Resource
-	Colls	string	`json:"_colls,omitempty"`
-	Users	string	`json:"_users,omitempty"`
+	Colls string `json:"_colls,omitempty"`
+	Users string `json:"_users,omitempty"`
+}
+
+// Databases slice of Database elements
+type Databases []Database
+
+// First returns first database in slice
+func (d Databases) First() *Database {
+	if len(d) == 0 {
+		return nil
+	}
+	return &d[0]
 }
 
 // Collection
 type Collection struct {
 	Resource
-	IndexingPolicy	IndexingPolicy	`json:"indexingPolicy,omitempty"`
-	Docs		string		`json:"_docs,omitempty"`
-	Udf		string		`json:"_udfs,omitempty"`
-	Sporcs		string		`json:"_sporcs,omitempty"`
-	Triggers	string		`json:"_triggers,omitempty"`
-	Conflicts	string		`json:"_conflicts,omitempty"`
+	IndexingPolicy IndexingPolicy `json:"indexingPolicy,omitempty"`
+	Docs           string         `json:"_docs,omitempty"`
+	Udf            string         `json:"_udfs,omitempty"`
+	Sporcs         string         `json:"_sporcs,omitempty"`
+	Triggers       string         `json:"_triggers,omitempty"`
+	Conflicts      string         `json:"_conflicts,omitempty"`
+}
+
+// Collection slice of Collection elements
+type Collections []Collection
+
+// First returns first database in slice
+func (c Collections) First() *Collection {
+	if len(c) == 0 {
+		return nil
+	}
+	return &c[0]
 }
 
 // Document
 type Document struct {
 	Resource
-	attachments	string	`json: "attachments,omitempty"`
+	attachments string `json: "attachments,omitempty"`
 }
 
 // Stored Procedure
 type Sproc struct {
 	Resource
-	Body	string	`json:"body,omitempty"`
+	Body string `json:"body,omitempty"`
 }
 
 // User Defined Function
 type UDF struct {
 	Resource
-	Body	string	`json:"body,omitempty"`
+	Body string `json:"body,omitempty"`
+}
+
+type Link []string
+
+func (l Link) ToURL(url string) string {
+	b := bytes.Buffer{}
+	b.WriteString(url)
+	b.WriteRune('/')
+	ln := len(l)
+	for i := 0; i < ln; i++ {
+		b.WriteString(l[i])
+	}
+	return b.String()
 }
