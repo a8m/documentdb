@@ -50,7 +50,7 @@ type Request struct {
 
 // Return new resource request with type and id
 func ResourceRequest(link string, req *http.Request) *Request {
-	rId, rType := parse(req.URL.Path)
+	rId, rType := parse(link)
 	return &Request{rId, rType, req}
 }
 

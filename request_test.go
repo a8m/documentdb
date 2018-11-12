@@ -41,20 +41,17 @@ func TestUpsertHeaders(t *testing.T) {
 	r, _ := http.NewRequest("POST", "link", &bytes.Buffer{})
 	req := ResourceRequest("/dbs/b5NCAA==/", r)
 
+	Upsert()(req)
+
 	assert := assert.New(t)
-	assert.NotEqual(req.Header.Get(HEADER_AUTH), "")
-	assert.NotEqual(req.Header.Get(HEADER_XDATE), "")
-	assert.NotEqual(req.Header.Get(HEADER_VER), "")
 	assert.Equal(req.Header.Get(HEADER_UPSERT), "true")
 }
 
 func TestPartitionKeyMarshalJSON(t *testing.T) {
 	r, _ := http.NewRequest("GET", "link", &bytes.Buffer{})
 	req := ResourceRequest("/dbs/b5NCAA==/", r)
-	// requestOptions := func(reqOpts *RequestOptions) {
-	// 	reqOpts.PartitionKey = &TestPartitionKey{"test"}
-	// }
-	//_ = req.RequestOptionsHeaders([]func(*RequestOptions){requestOptions})
+
+	PartitionKey(&TestPartitionKey{"test"})(req)
 
 	assert := assert.New(t)
 	assert.Equal([]string{"{\"newProp\":\"test\"}"}, req.Header[HEADER_PARTITION_KEY])
@@ -63,10 +60,8 @@ func TestPartitionKeyMarshalJSON(t *testing.T) {
 func TestPartitionKeyAsInt(t *testing.T) {
 	r, _ := http.NewRequest("GET", "link", &bytes.Buffer{})
 	req := ResourceRequest("/dbs/b5NCAA==/", r)
-	// requestOptions := func(reqOpts *RequestOptions) {
-	// 	reqOpts.PartitionKey = 1
-	// }
-	//_ = req.RequestOptionsHeaders([]func(*RequestOptions){requestOptions})
+
+	PartitionKey(1)(req)
 
 	assert := assert.New(t)
 	assert.Equal([]string{"[1]"}, req.Header[HEADER_PARTITION_KEY])
@@ -75,10 +70,8 @@ func TestPartitionKeyAsInt(t *testing.T) {
 func TestPartitionKeyAsString(t *testing.T) {
 	r, _ := http.NewRequest("GET", "link", &bytes.Buffer{})
 	req := ResourceRequest("/dbs/b5NCAA==/", r)
-	// requestOptions := func(reqOpts *RequestOptions) {
-	// 	reqOpts.PartitionKey = "1"
-	// }
-	//_ = req.RequestOptionsHeaders([]func(*RequestOptions){requestOptions})
+
+	PartitionKey("1")(req)
 
 	assert := assert.New(t)
 	assert.Equal([]string{"[\"1\"]"}, req.Header[HEADER_PARTITION_KEY])

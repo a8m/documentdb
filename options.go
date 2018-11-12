@@ -43,11 +43,13 @@ func PartitionKey(partitionKey interface{}) CallOption {
 		pk, err = marshal([]interface{}{v})
 	}
 
+	header := []string{string(pk)}
+
 	return func(r *Request) error {
 		if err != nil {
 			return err
 		}
-		r.Header.Set(HEADER_PARTITION_KEY, string(pk))
+		r.Header[HEADER_PARTITION_KEY] = header
 		return nil
 	}
 }

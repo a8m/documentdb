@@ -249,27 +249,27 @@ func (c *DocumentDB) UpsertDocument(coll string, doc interface{}, opts ...CallOp
 
 // TODO: DRY, but the sdk want that[mm.. maybe just client.Delete(self_link)]
 // Delete database
-func (c *DocumentDB) DeleteDatabase(link string) error {
+func (c *DocumentDB) DeleteDatabase(link string) (*Response, error) {
 	return c.client.Delete(link)
 }
 
 // Delete collection
-func (c *DocumentDB) DeleteCollection(link string) error {
+func (c *DocumentDB) DeleteCollection(link string) (*Response, error) {
 	return c.client.Delete(link)
 }
 
 // Delete document
-func (c *DocumentDB) DeleteDocument(link string) error {
+func (c *DocumentDB) DeleteDocument(link string) (*Response, error) {
 	return c.client.Delete(link)
 }
 
 // Delete stored procedure
-func (c *DocumentDB) DeleteStoredProcedure(link string) error {
+func (c *DocumentDB) DeleteStoredProcedure(link string) (*Response, error) {
 	return c.client.Delete(link)
 }
 
 // Delete user defined function
-func (c *DocumentDB) DeleteUserDefinedFunction(link string) error {
+func (c *DocumentDB) DeleteUserDefinedFunction(link string) (*Response, error) {
 	return c.client.Delete(link)
 }
 
