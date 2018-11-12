@@ -4,33 +4,22 @@ import (
 	"bytes"
 	"io"
 	"net/http"
-	"sync"
-
-	jsoniter "github.com/json-iterator/go"
-)
-
-var (
-	newEncoder = jsoniter.NewEncoder
-	newDecoder = jsoniter.NewDecoder
-	//newEncoder = json.NewEncoder
-	//newDecoder = json.NewDecoder
 )
 
 type Clienter interface {
-	Read(link Link, ret interface{}, opts ...CallOption) (*Response, error)
-	Delete(link Link, opts ...CallOption) (*Response, error)
-	Query(link Link, query *Query, ret interface{}, opts ...CallOption) (*Response, error)
-	Create(link Link, body, ret interface{}, opts ...CallOption) (*Response, error)
-	Upsert(link Link, body, ret interface{}, opts ...CallOption) (*Response, error)
-	Replace(link Link, body, ret interface{}, opts ...CallOption) (*Response, error)
-	Execute(link Link, body, ret interface{}, opts ...CallOption) (*Response, error)
+	Read(link string, ret interface{}, opts ...CallOption) (*Response, error)
+	Delete(link string, opts ...CallOption) (*Response, error)
+	Query(link string, query *Query, ret interface{}, opts ...CallOption) (*Response, error)
+	Create(link string, body, ret interface{}, opts ...CallOption) (*Response, error)
+	Upsert(link string, body, ret interface{}, opts ...CallOption) (*Response, error)
+	Replace(link string, body, ret interface{}, opts ...CallOption) (*Response, error)
+	Execute(link string, body, ret interface{}, opts ...CallOption) (*Response, error)
 }
 
 type Client struct {
 	Url    string
 	Config Config
 	http.Client
-	buffers *sync.Pool
 }
 
 func (c *Client) apply(r *Request, opts []CallOption) (err error) {
@@ -47,36 +36,37 @@ func (c *Client) apply(r *Request, opts []CallOption) (err error) {
 }
 
 // Read resource by self link
-func (c *Client) Read(link Link, ret interface{}, opts ...CallOption) (*Response, error) {
-	buf := c.buffers.Get().(*bytes.Buffer)
-
+func (c *Client) Read(link string, ret interface{}, opts ...CallOption) (*Response, error) {
+	buf := buffers.Get().(*bytes.Buffer)
+	buf.Reset()
 	res, err := c.method("GET", link, http.StatusOK, ret, buf, opts...)
 
-	c.buffers.Put(buf)
+	buffers.Put(buf)
 
 	return res, err
 }
 
 // Delete resource by self link
-func (c *Client) Delete(link Link, opts ...CallOption) (*Response, error) {
+func (c *Client) Delete(link string, opts ...CallOption) (*Response, error) {
 	return c.method("DELETE", link, http.StatusNoContent, nil, &bytes.Buffer{}, opts...)
 }
 
 // Query resource
-func (c *Client) Query(link Link, query *Query, ret interface{}, opts ...CallOption) (*Response, error) {
+func (c *Client) Query(link string, query *Query, ret interface{}, opts ...CallOption) (*Response, error) {
 	var (
 		err error
 		req *http.Request
-		buf = c.buffers.Get().(*bytes.Buffer)
+		buf = buffers.Get().(*bytes.Buffer)
 	)
-	defer func() { buf.Reset(); c.buffers.Put(buf) }()
+	buf.Reset()
+	defer func() { buffers.Put(buf) }()
 
 	if err = newEncoder(buf).Encode(query); err != nil {
 		return nil, err
 
 	}
 
-	req, err = http.NewRequest("POST", link.ToURL(c.Url), buf)
+	req, err = http.NewRequest("POST", c.Url+"/"+link, buf)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +82,7 @@ func (c *Client) Query(link Link, query *Query, ret interface{}, opts ...CallOpt
 }
 
 // Create resource
-func (c *Client) Create(link Link, body, ret interface{}, opts ...CallOption) (*Response, error) {
+func (c *Client) Create(link string, body, ret interface{}, opts ...CallOption) (*Response, error) {
 	data, err := stringify(body)
 	if err != nil {
 		return nil, err
@@ -102,13 +92,13 @@ func (c *Client) Create(link Link, body, ret interface{}, opts ...CallOption) (*
 }
 
 // Upsert resource
-func (c *Client) Upsert(link Link, body, ret interface{}, opts ...CallOption) (*Response, error) {
+func (c *Client) Upsert(link string, body, ret interface{}, opts ...CallOption) (*Response, error) {
 	opts = append(opts, Upsert())
 	return c.Create(link, body, ret, opts...)
 }
 
 // Replace resource
-func (c *Client) Replace(link Link, body, ret interface{}, opts ...CallOption) (*Response, error) {
+func (c *Client) Replace(link string, body, ret interface{}, opts ...CallOption) (*Response, error) {
 	data, err := stringify(body)
 	if err != nil {
 		return nil, err
@@ -119,7 +109,7 @@ func (c *Client) Replace(link Link, body, ret interface{}, opts ...CallOption) (
 
 // Replace resource
 // TODO: DRY, move to methods instead of actions(POST, PUT, ...)
-func (c *Client) Execute(link Link, body, ret interface{}, opts ...CallOption) (*Response, error) {
+func (c *Client) Execute(link string, body, ret interface{}, opts ...CallOption) (*Response, error) {
 	data, err := stringify(body)
 	if err != nil {
 		return nil, err
@@ -129,8 +119,8 @@ func (c *Client) Execute(link Link, body, ret interface{}, opts ...CallOption) (
 }
 
 // Private generic method resource
-func (c *Client) method(method string, link Link, status int, ret interface{}, body *bytes.Buffer, opts ...CallOption) (*Response, error) {
-	req, err := http.NewRequest(method, link.ToURL(c.Url), body)
+func (c *Client) method(method string, link string, status int, ret interface{}, body *bytes.Buffer, opts ...CallOption) (*Response, error) {
+	req, err := http.NewRequest(method, c.Url+"/"+link, body)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +165,7 @@ func stringify(body interface{}) (bt []byte, err error) {
 	case []byte:
 		bt = t
 	default:
-		bt, err = jsoniter.Marshal(t)
+		bt, err = marshal(t)
 	}
 	return
 }

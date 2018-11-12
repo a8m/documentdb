@@ -1,6 +1,5 @@
 package documentdb
 
-/*
 import (
 	"fmt"
 	"io/ioutil"
@@ -66,7 +65,7 @@ func TestRead(t *testing.T) {
 	assert := assert.New(t)
 	s := ServerFactory(`{"_colls": "colls"}`, 500)
 	defer s.Close()
-	client := &Client{Url: s.URL, Config: Config{MasterKey: "YXJpZWwNCg=="}}
+	client := &Client{Url: s.URL, Config: Config{MasterKey: &Key{Key: "YXJpZWwNCg=="}}}
 
 	// First call
 	var db Database
@@ -84,7 +83,7 @@ func TestQuery(t *testing.T) {
 	assert := assert.New(t)
 	s := ServerFactory(`{"_colls": "colls"}`, 500)
 	defer s.Close()
-	client := &Client{Url: s.URL, Config: Config{MasterKey: "YXJpZWwNCg=="}}
+	client := &Client{Url: s.URL, Config: Config{MasterKey: &Key{Key: "YXJpZWwNCg=="}}}
 
 	// First call
 	var db Database
@@ -104,7 +103,7 @@ func TestCreate(t *testing.T) {
 	s := ServerFactory(`{"_colls": "colls"}`, `{"id": "9"}`, 500)
 	s.SetStatus(http.StatusCreated)
 	defer s.Close()
-	client := &Client{Url: s.URL, Config: Config{MasterKey: "YXJpZWwNCg=="}}
+	client := &Client{Url: s.URL, Config: Config{MasterKey: &Key{Key: "YXJpZWwNCg=="}}}
 
 	// First call
 	var db Database
@@ -131,7 +130,7 @@ func TestDelete(t *testing.T) {
 	s := ServerFactory(`10`, 500)
 	s.SetStatus(http.StatusNoContent)
 	defer s.Close()
-	client := &Client{Url: s.URL, Config: Config{MasterKey: "YXJpZWwNCg=="}}
+	client := &Client{Url: s.URL, Config: Config{MasterKey: &Key{Key: "YXJpZWwNCg=="}}}
 
 	// First call
 	_, err := client.Delete("/dbs/b7NTAS==/")
@@ -148,7 +147,7 @@ func TestReplace(t *testing.T) {
 	s := ServerFactory(`{"_colls": "colls"}`, `{"id": "9"}`, 500)
 	s.SetStatus(http.StatusOK)
 	defer s.Close()
-	client := &Client{Url: s.URL, Config: Config{MasterKey: "YXJpZWwNCg=="}}
+	client := &Client{Url: s.URL, Config: Config{MasterKey: &Key{Key: "YXJpZWwNCg=="}}}
 
 	// First call
 	var db Database
@@ -175,7 +174,7 @@ func TestExecute(t *testing.T) {
 	s := ServerFactory(`{"_colls": "colls"}`, `{"id": "9"}`, 500)
 	s.SetStatus(http.StatusOK)
 	defer s.Close()
-	client := &Client{Url: s.URL, Config: Config{MasterKey: "YXJpZWwNCg=="}}
+	client := &Client{Url: s.URL, Config: Config{MasterKey: &Key{Key: "YXJpZWwNCg=="}}}
 
 	// First call
 	var db Database
@@ -196,4 +195,3 @@ func TestExecute(t *testing.T) {
 	_, err = client.Execute("dbs", tDoc, &doc)
 	assert.Equal(err.Error(), "500, DocumentDB error")
 }
-*/

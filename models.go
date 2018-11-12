@@ -1,9 +1,5 @@
 package documentdb
 
-import (
-	"bytes"
-)
-
 // Resource
 type Resource struct {
 	Id   string `json:"id,omitempty"`
@@ -76,17 +72,4 @@ type Sproc struct {
 type UDF struct {
 	Resource
 	Body string `json:"body,omitempty"`
-}
-
-type Link []string
-
-func (l Link) ToURL(url string) string {
-	b := bytes.Buffer{}
-	b.WriteString(url)
-	b.WriteRune('/')
-	ln := len(l)
-	for i := 0; i < ln; i++ {
-		b.WriteString(l[i])
-	}
-	return b.String()
 }

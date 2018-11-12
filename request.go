@@ -10,19 +10,23 @@ import (
 )
 
 const (
-	HEADER_XDATE          = "X-Ms-Date"
-	HEADER_AUTH           = "Authorization"
-	HEADER_VER            = "X-Ms-Version"
-	HEADER_CONTYPE        = "Content-Type"
-	HEADER_CONLEN         = "Content-Length"
-	HEADER_IS_QUERY       = "X-Ms-Documentdb-Isquery"
-	HEADER_UPSERT         = "x-ms-documentdb-is-upsert"
-	HEADER_PARTITION_KEY  = "x-ms-documentdb-partitionkey"
-	HEADER_MAX_ITEM_COUNT = "x-ms-max-item-count"
-	HEADER_CONTINUATION   = "x-ms-continuation"
-	HEADER_CONSISTENCY    = "x-ms-consistency-level"
-	HEADER_SESSION    = "x-ms-session-token"
+	HEADER_XDATE             = "X-Ms-Date"
+	HEADER_AUTH              = "Authorization"
+	HEADER_VER               = "X-Ms-Version"
+	HEADER_CONTYPE           = "Content-Type"
+	HEADER_CONLEN            = "Content-Length"
+	HEADER_IS_QUERY          = "X-Ms-Documentdb-Isquery"
+	HEADER_UPSERT            = "x-ms-documentdb-is-upsert"
+	HEADER_PARTITION_KEY     = "x-ms-documentdb-partitionkey"
+	HEADER_MAX_ITEM_COUNT    = "x-ms-max-item-count"
+	HEADER_CONTINUATION      = "x-ms-continuation"
+	HEADER_CONSISTENCY       = "x-ms-consistency-level"
+	HEADER_SESSION           = "x-ms-session-token"
 	HEADER_CROSSPARTITION    = "x-ms-documentdb-query-enablecrosspartitions"
+	HEADER_IFMATCH           = "If-Match"
+	HEADER_IF_NONE_MATCH     = "If-None-Match"
+	HEADER_IF_MODIFIED_SINCE = "If-Modified-Since"
+	HEADER_ACTIVITY_ID       = "x-ms-activity-id"
 
 	SupportedVersion = "2017-02-22"
 )
@@ -45,18 +49,19 @@ type Request struct {
 }
 
 // Return new resource request with type and id
-func ResourceRequest(link Link, req *http.Request) *Request {
+func ResourceRequest(link string, req *http.Request) *Request {
 	rId, rType := parse(req.URL.Path)
 	return &Request{rId, rType, req}
 }
 
 // Add 3 default headers to *Request
 // "x-ms-date", "x-ms-version", "authorization"
-func (req *Request) DefaultHeaders(mKey string) (err error) {
-	req.Header.Add(HEADER_XDATE, time.Now().UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT"))
+func (req *Request) DefaultHeaders(mKey *Key) (err error) {
+	req.Header.Add(HEADER_XDATE, formatDate(time.Now()))
 	req.Header.Add(HEADER_VER, SupportedVersion)
 
-	b := bytes.Buffer{}
+	b := buffers.Get().(*bytes.Buffer)
+	b.Reset()
 	b.WriteString(req.Method)
 	b.WriteRune('\n')
 	b.WriteString(req.rType)
@@ -72,6 +77,8 @@ func (req *Request) DefaultHeaders(mKey string) (err error) {
 	if err != nil {
 		return err
 	}
+
+	buffers.Put(b)
 
 	req.Header.Add(HEADER_AUTH, url.QueryEscape("type=master&ver=1.0&sig="+sign))
 
@@ -106,36 +113,7 @@ func parse(id string) (rId, rType string) {
 	return
 }
 
-// // Get path and return resource Id and Type
-// // (e.g: "/dbs/b5NCAA==/" ==> "b5NCAA==", "dbs")
-// func parse(link Link) (rId, rType string) {
-
-// 	fmt.Println("parse:", link)
-
-// 	l := len(link) // 4
-
-// 	if l == 1 {
-// 		rType = link[0]
-// 	} else {
-
-// 		if l%2 == 0 {
-// 			rId = link[l-1]
-// 			rType = link[l-2]
-// 		} else {
-// 			rId = link[l-2]
-// 			rType = link[l-1]
-// 		}
-// 	}
-// 	l = len(rId)
-// 	if l > 0 && rId[l-1] == '/' {
-// 		rId = rId[0 : l-1]
-// 	}
-// 	l = len(rType)
-// 	if rType[l-1] == '/' {
-// 		rType = rType[0 : l-1]
-// 	}
-// 	if rType[0] == '/' {
-// 		rType = rType[1:]
-// 	}
-// 	return
-// }
+func formatDate(t time.Time) string {
+	t = t.UTC()
+	return t.Format("Mon, 02 Jan 2006 15:04:05 GMT")
+}
