@@ -27,6 +27,8 @@ const (
 	HEADER_IF_NONE_MATCH     = "If-None-Match"
 	HEADER_IF_MODIFIED_SINCE = "If-Modified-Since"
 	HEADER_ACTIVITY_ID       = "x-ms-activity-id"
+	HEADER_SESSION_TOKEN     = "x-ms-session-token"
+	HEADER_REQUEST_CHARGE    = "x-ms-request-charge"
 
 	SupportedVersion = "2017-02-22"
 )
