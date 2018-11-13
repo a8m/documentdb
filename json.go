@@ -9,6 +9,4 @@ var (
 	newDecoder = jsoniter.NewDecoder
 	marshal    = jsoniter.Marshal
 	unmarshal  = jsoniter.Unmarshal
-	//newEncoder = json.NewEncoder
-	//newDecoder = json.NewDecoder
 )

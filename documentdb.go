@@ -34,7 +34,7 @@ func DefaultIdentificationHydrator(config *Config, doc interface{}) {
 
 type Config struct {
 	MasterKey                  *Key
-	HttpClient                 http.Client
+	Client                     http.Client
 	IdentificationHydrator     IdentificationHydrator
 	IdentificationPropertyName string
 }
@@ -47,15 +47,21 @@ func NewConfig(key *Key) *Config {
 	}
 }
 
+// WithClient stores given http client for later use by documentdb client.
+func (c *Config) WithClient(client http.Client) *Config {
+	c.Client = client
+	return c
+}
+
 type DocumentDB struct {
 	client Clienter
 	config *Config
 }
 
-// Create DocumentDBClient
+// New creates DocumentDBClient
 func New(url string, config *Config) *DocumentDB {
 	client := &Client{
-		Client: config.HttpClient,
+		Client: config.Client,
 	}
 	client.Url = url
 	client.Config = config

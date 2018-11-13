@@ -276,7 +276,11 @@ type User struct {
 func main() {
 	// ...
 	var users []User
-	err = client.QueryDocuments("coll_self_link", "SELECT * FROM ROOT r", &users)
+	_, err = client.QueryDocuments(
+        "coll_self_link", 
+        documentdb.NewQuery("SELECT * FROM ROOT r WHERE r.name=@name", documentdb.P{"@name", "john"}),
+        &users,
+    )
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -299,12 +303,16 @@ type User struct {
 func main() {
 	// ...
 	var users []User
-
-	partitionKey := func(reqOpts *documentdb.RequestOptions) {
-		reqOpts.PartitionKey = []string{"Your-Partition-Key"}
-	}
-
-	err = client.QueryDocumentsWithRequestOptions("coll_self_link", "SELECT * FROM ROOT r", &users, partitionKey)
+	_, err = client.QueryDocuments(
+        "coll_self_link", 
+        documentdb.NewQuery(
+            "SELECT * FROM ROOT r WHERE r.name=@name AND r.company_id = @company_id", 
+            documentdb.P{"@name", "john"}, 
+            documentdb.P{"@company_id", "1234"},
+        ),
+        &users,
+        documentdb.PartitionKey("1234")
+    )
 	if err != nil {
 		log.Fatal(err)
 	}
