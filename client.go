@@ -18,7 +18,7 @@ type Clienter interface {
 
 type Client struct {
 	Url    string
-	Config Config
+	Config *Config
 	http.Client
 }
 

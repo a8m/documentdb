@@ -413,6 +413,28 @@ func main() {
 }
 ```
 
+#### Iterator
+
+```go
+func main() {
+	// ...
+	var docs []Document
+
+    iterator := documentdb.NewIterator(
+		client, documentdb.NewDocumentIterator("coll_self_link", nil, &docs, documentdb.PartitionKey("1"), documentdb.Limit(1)),
+	)
+
+	for iterator.Next() {
+		if err := iterator.Error(); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(len(docs))
+	}    
+
+	// ...
+}
+```
+
 ### Examples
 
 * [Go DocumentDB Example](https://github.com/a8m/go-documentdb-example) - A users CRUD application using Martini and DocumentDB

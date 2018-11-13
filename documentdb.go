@@ -10,6 +10,7 @@ package documentdb
 import (
 	"bytes"
 	"net/http"
+	"reflect"
 	"sync"
 )
 
@@ -19,27 +20,46 @@ var buffers = &sync.Pool{
 	},
 }
 
-type RequestOptions struct {
-	PartitionKey interface{}
+// IdentificationHydrator defines interface for ID hydrators
+// that can prepopulate struct with default values
+type IdentificationHydrator func(config *Config, doc interface{})
+
+// DefaultIdentificationHydrator fills Id
+func DefaultIdentificationHydrator(config *Config, doc interface{}) {
+	id := reflect.ValueOf(doc).Elem().FieldByName(config.IdentificationPropertyName)
+	if id.IsValid() && id.String() == "" {
+		id.SetString(uuid())
+	}
 }
 
 type Config struct {
-	MasterKey  *Key
-	HttpClient http.Client
+	MasterKey                  *Key
+	HttpClient                 http.Client
+	IdentificationHydrator     IdentificationHydrator
+	IdentificationPropertyName string
+}
+
+func NewConfig(key *Key) *Config {
+	return &Config{
+		MasterKey:                  key,
+		IdentificationHydrator:     DefaultIdentificationHydrator,
+		IdentificationPropertyName: "Id",
+	}
 }
 
 type DocumentDB struct {
 	client Clienter
+	config *Config
 }
 
 // Create DocumentDBClient
-func New(url string, config Config) *DocumentDB {
+func New(url string, config *Config) *DocumentDB {
 	client := &Client{
 		Client: config.HttpClient,
 	}
 	client.Url = url
 	client.Config = config
-	return &DocumentDB{client}
+	return &DocumentDB{client: client, config: config}
 }
 
 // TODO: Add `requestOptions` arguments
@@ -231,19 +251,17 @@ func (c *DocumentDB) CreateUserDefinedFunction(coll string, body interface{}, op
 
 // Create document
 func (c *DocumentDB) CreateDocument(coll string, doc interface{}, opts ...CallOption) (*Response, error) {
-	// id := reflect.ValueOf(doc).Elem().FieldByName("Id")
-	// if id.IsValid() && id.String() == "" {
-	// 	id.SetString(uuid())
-	// }
+	if c.config.IdentificationHydrator != nil {
+		c.config.IdentificationHydrator(c.config, doc)
+	}
 	return c.client.Create(coll+"docs/", doc, &doc, opts...)
 }
 
 // Upsert document
 func (c *DocumentDB) UpsertDocument(coll string, doc interface{}, opts ...CallOption) (*Response, error) {
-	// id := reflect.ValueOf(doc).Elem().FieldByName("Id")
-	// if id.IsValid() && id.String() == "" {
-	// 	id.SetString(uuid())
-	// }
+	if c.config.IdentificationHydrator != nil {
+		c.config.IdentificationHydrator(c.config, doc)
+	}
 	return c.client.Upsert(coll+"docs/", doc, &doc, opts...)
 }
 

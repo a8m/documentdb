@@ -1,6 +1,5 @@
 package documentdb
 
-/*
 import (
 	"errors"
 	"testing"
@@ -50,7 +49,7 @@ func (c *ClientStub) Execute(link string, body, ret interface{}, opts ...CallOpt
 
 func TestNew(t *testing.T) {
 	assert := assert.New(t)
-	client := New("url", Config{MasterKey: "config"})
+	client := New("url", Config{MasterKey: NewKey("config")})
 	assert.IsType(client, &DocumentDB{}, "Should return DocumentDB object")
 }
 
@@ -255,8 +254,24 @@ func TestDeleteResource(t *testing.T) {
 	c := &DocumentDB{client}
 
 	client.On("Delete", "self_link_db").Return(nil)
-	c.Delete("self_link_db")
+	c.DeleteDatabase("self_link_db")
 	client.AssertCalled(t, "Delete", "self_link_db")
+
+	client.On("Delete", "self_link_coll").Return(nil)
+	c.DeleteCollection("self_link_coll")
+	client.AssertCalled(t, "Delete", "self_link_coll")
+
+	client.On("Delete", "self_link_doc").Return(nil)
+	c.DeleteDocument("self_link_doc")
+	client.AssertCalled(t, "Delete", "self_link_doc")
+
+	client.On("Delete", "self_link_sproc").Return(nil)
+	c.DeleteDocument("self_link_sproc")
+	client.AssertCalled(t, "Delete", "self_link_sproc")
+
+	client.On("Delete", "self_link_udf").Return(nil)
+	c.DeleteDocument("self_link_udf")
+	client.AssertCalled(t, "Delete", "self_link_udf")
 }
 
 func TestReplaceDatabase(t *testing.T) {
@@ -298,4 +313,3 @@ func TestExecuteStoredProcedure(t *testing.T) {
 	c.ExecuteStoredProcedure("sproc_link", "{}", struct{}{})
 	client.AssertCalled(t, "Execute", "sproc_link", "{}")
 }
-*/
