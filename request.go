@@ -103,7 +103,7 @@ func parse(id string) (rId, rType string) {
 	}
 
 	parts := strings.Split(id, "/")
-	l := len(parts) // 4
+	l := len(parts)
 
 	if l%2 == 0 {
 		rId = parts[l-2]
