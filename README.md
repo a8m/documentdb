@@ -46,6 +46,8 @@ I'm doing it on my spare time and hope to stabilize it soon. if you want to cont
   * [Create](#createuserdefinedfunction)
   * [Replace](#replaceuserdefinedfunction)
   * [Delete](#deleteuserdefinedfunction)
+ * [Iterator](#iterator)
+  * [DocumentIterator](#documentIterator)
 
 ### Get Started
 
@@ -305,13 +307,13 @@ func main() {
 	var users []User
 	_, err = client.QueryDocuments(
         "coll_self_link", 
-        documentdb.NewQuery(
-            "SELECT * FROM ROOT r WHERE r.name=@name AND r.company_id = @company_id", 
-            documentdb.P{"@name", "john"}, 
-            documentdb.P{"@company_id", "1234"},
-        ),
-        &users,
-        documentdb.PartitionKey("1234")
+		documentdb.NewQuery(
+			"SELECT * FROM ROOT r WHERE r.name=@name AND r.company_id = @company_id", 
+			documentdb.P{"@name", "john"}, 
+			documentdb.P{"@company_id", "1234"},
+		),
+		&users,
+		documentdb.PartitionKey("1234")
     )
 	if err != nil {
 		log.Fatal(err)
@@ -421,14 +423,16 @@ func main() {
 }
 ```
 
-#### Iterator
+### Iterator
+
+#### DocumentIterator
 
 ```go
 func main() {
 	// ...
 	var docs []Document
 
-    iterator := documentdb.NewIterator(
+	iterator := documentdb.NewIterator(
 		client, documentdb.NewDocumentIterator("coll_self_link", nil, &docs, documentdb.PartitionKey("1"), documentdb.Limit(1)),
 	)
 
