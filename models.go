@@ -59,7 +59,7 @@ func (c Collections) First() *Collection {
 // Document
 type Document struct {
 	Resource
-	attachments string `json: "attachments,omitempty"`
+	attachments string `json:"attachments,omitempty"`
 }
 
 // Stored Procedure

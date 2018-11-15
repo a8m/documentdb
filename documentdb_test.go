@@ -47,6 +47,11 @@ func (c *ClientStub) Execute(link string, body, ret interface{}, opts ...CallOpt
 	return nil, nil
 }
 
+var defaultConfig = &Config{
+	IdentificationHydrator:     DefaultIdentificationHydrator,
+	IdentificationPropertyName: "Id",
+}
+
 func TestNew(t *testing.T) {
 	assert := assert.New(t)
 	client := New("url", NewConfig(&Key{Key: "YXJpZWwNCg=="}))
@@ -157,42 +162,47 @@ func TestReadDocuments(t *testing.T) {
 func TestQueryDatabases(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client, nil}
-	client.On("Query", "dbs", "SELECT * FROM ROOT r").Return(nil)
-	c.QueryDatabases(NewQuery("SELECT * FROM ROOT r"))
-	client.AssertCalled(t, "Query", "dbs", "SELECT * FROM ROOT r")
+	q := NewQuery("SELECT * FROM ROOT r")
+	client.On("Query", "dbs", q).Return(nil)
+	c.QueryDatabases(q)
+	client.AssertCalled(t, "Query", "dbs", q)
 }
 
 func TestQueryCollections(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client, nil}
-	client.On("Query", "db_self_link/colls/", "SELECT * FROM ROOT r").Return(nil)
-	c.QueryCollections("db_self_link/", NewQuery("SELECT * FROM ROOT r"))
-	client.AssertCalled(t, "Query", "db_self_link/colls/", "SELECT * FROM ROOT r")
+	q := NewQuery("SELECT * FROM ROOT r")
+	client.On("Query", "db_self_link/colls/", q).Return(nil)
+	c.QueryCollections("db_self_link/", q)
+	client.AssertCalled(t, "Query", "db_self_link/colls/", q)
 }
 
 func TestQueryStoredProcedures(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client, nil}
-	client.On("Query", "colls_self_link/sprocs/", "SELECT * FROM ROOT r").Return(nil)
-	c.QueryStoredProcedures("colls_self_link/", NewQuery("SELECT * FROM ROOT r"))
-	client.AssertCalled(t, "Query", "colls_self_link/sprocs/", "SELECT * FROM ROOT r")
+	q := NewQuery("SELECT * FROM ROOT r")
+	client.On("Query", "colls_self_link/sprocs/", q).Return(nil)
+	c.QueryStoredProcedures("colls_self_link/", q)
+	client.AssertCalled(t, "Query", "colls_self_link/sprocs/", q)
 }
 
 func TestQueryUserDefinedFunctions(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client, nil}
-	client.On("Query", "colls_self_link/udfs/", "SELECT * FROM ROOT r").Return(nil)
-	c.QueryUserDefinedFunctions("colls_self_link/", NewQuery("SELECT * FROM ROOT r"))
-	client.AssertCalled(t, "Query", "colls_self_link/udfs/", "SELECT * FROM ROOT r")
+	q := NewQuery("SELECT * FROM ROOT r")
+	client.On("Query", "colls_self_link/udfs/", q).Return(nil)
+	c.QueryUserDefinedFunctions("colls_self_link/", q)
+	client.AssertCalled(t, "Query", "colls_self_link/udfs/", q)
 }
 
 func TestQueryDocuments(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client, nil}
 	collLink := "coll_self_link/"
-	client.On("Query", collLink+"docs/", "SELECT * FROM ROOT r").Return(nil)
-	c.QueryDocuments(collLink, NewQuery("SELECT * FROM ROOT r"), struct{}{})
-	client.AssertCalled(t, "Query", collLink+"docs/", "SELECT * FROM ROOT r")
+	q := NewQuery("SELECT * FROM ROOT r")
+	client.On("Query", collLink+"docs/", q).Return(nil)
+	c.QueryDocuments(collLink, q, struct{}{})
+	client.AssertCalled(t, "Query", collLink+"docs/", q)
 }
 
 func TestCreateDatabase(t *testing.T) {
@@ -229,7 +239,7 @@ func TestCreateUserDefinedFunction(t *testing.T) {
 
 func TestCreateDocument(t *testing.T) {
 	client := &ClientStub{}
-	c := &DocumentDB{client, nil}
+	c := &DocumentDB{client, defaultConfig}
 	// TODO: test error situation, without id, etc...
 	var doc Document
 	client.On("Create", "dbs/colls/docs/", &doc).Return(nil)
@@ -240,7 +250,7 @@ func TestCreateDocument(t *testing.T) {
 
 func TestUpsertDocument(t *testing.T) {
 	client := &ClientStub{}
-	c := &DocumentDB{client, nil}
+	c := &DocumentDB{client, defaultConfig}
 	// TODO: test error situation, without id, etc...
 	var doc Document
 	client.On("Upsert", "dbs/colls/docs/", &doc).Return(nil)

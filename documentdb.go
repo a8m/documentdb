@@ -257,7 +257,7 @@ func (c *DocumentDB) CreateUserDefinedFunction(coll string, body interface{}, op
 
 // Create document
 func (c *DocumentDB) CreateDocument(coll string, doc interface{}, opts ...CallOption) (*Response, error) {
-	if c.config.IdentificationHydrator != nil {
+	if c.config != nil && c.config.IdentificationHydrator != nil {
 		c.config.IdentificationHydrator(c.config, doc)
 	}
 	return c.client.Create(coll+"docs/", doc, &doc, opts...)
@@ -265,7 +265,7 @@ func (c *DocumentDB) CreateDocument(coll string, doc interface{}, opts ...CallOp
 
 // Upsert document
 func (c *DocumentDB) UpsertDocument(coll string, doc interface{}, opts ...CallOption) (*Response, error) {
-	if c.config.IdentificationHydrator != nil {
+	if c.config != nil && c.config.IdentificationHydrator != nil {
 		c.config.IdentificationHydrator(c.config, doc)
 	}
 	return c.client.Upsert(coll+"docs/", doc, &doc, opts...)
