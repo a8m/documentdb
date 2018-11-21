@@ -38,9 +38,9 @@ func PartitionKey(partitionKey interface{}) CallOption {
 	)
 	switch v := partitionKey.(type) {
 	case json.Marshaler:
-		pk, err = marshal(v)
+		pk, err = Serialization.Marshal(v)
 	default:
-		pk, err = marshal([]interface{}{v})
+		pk, err = Serialization.Marshal([]interface{}{v})
 	}
 
 	header := []string{string(pk)}

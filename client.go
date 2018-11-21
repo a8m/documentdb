@@ -61,7 +61,7 @@ func (c *Client) Query(link string, query *Query, ret interface{}, opts ...CallO
 	buf.Reset()
 	defer func() { buffers.Put(buf) }()
 
-	if err = newEncoder(buf).Encode(query); err != nil {
+	if err = Serialization.EncoderFactory(buf).Encode(query); err != nil {
 		return nil, err
 
 	}
@@ -154,7 +154,7 @@ func (c *Client) do(r *Request, status int, data interface{}) (*Response, error)
 
 // Read json response to given interface(struct, map, ..)
 func readJson(reader io.Reader, data interface{}) error {
-	return newDecoder(reader).Decode(&data)
+	return Serialization.DecoderFactory(reader).Decode(&data)
 }
 
 // Stringify body data
@@ -165,7 +165,7 @@ func stringify(body interface{}) (bt []byte, err error) {
 	case []byte:
 		bt = t
 	default:
-		bt, err = marshal(t)
+		bt, err = Serialization.Marshal(t)
 	}
 	return
 }
