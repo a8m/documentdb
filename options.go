@@ -132,3 +132,19 @@ func IfModifiedSince(date string) CallOption {
 		return nil
 	}
 }
+
+// ChangeFeed indicates a change feed request
+func ChangeFeed() CallOption {
+	return func(r *Request) error {
+		r.Header.Set(HEADER_A_IM, "Incremental feed")
+		return nil
+	}
+}
+
+// ChangeFeedPartitionRangeID used in change feed requests. The partition key range ID for reading data.
+func ChangeFeedPartitionRangeID(id string) CallOption {
+	return func(r *Request) error {
+		r.Header.Set(HEADER_PARTITION_KEY_RANGE_ID, id)
+		return nil
+	}
+}
