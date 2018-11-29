@@ -10,10 +10,10 @@ import (
 
 func init() {
 	documentdb.Serialization = documentdb.SerializationDriver{
-		EncoderFactory: func(b *bytes.Buffer) documentdb.JsonEncoder {
+		EncoderFactory: func(b *bytes.Buffer) documentdb.JSONEncoder {
 			return jsoniter.NewEncoder(b)
 		},
-		DecoderFactory: func(r io.Reader) documentdb.JsonDecoder {
+		DecoderFactory: func(r io.Reader) documentdb.JSONDecoder {
 			return jsoniter.NewDecoder(r)
 		},
 		Marshal:   jsoniter.Marshal,

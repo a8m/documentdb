@@ -6,13 +6,13 @@ import (
 	"io"
 )
 
-// JsonEncoder describes json encoder
-type JsonEncoder interface {
+// JSONEncoder describes json encoder
+type JSONEncoder interface {
 	Encode(val interface{}) error
 }
 
-// JsonDecoder describes json decoder
-type JsonDecoder interface {
+// JSONDecoder describes json decoder
+type JSONDecoder interface {
 	Decode(obj interface{}) error
 }
 
@@ -23,10 +23,10 @@ type Marshal func(v interface{}) ([]byte, error)
 type Unmarshal func(data []byte, v interface{}) error
 
 // EncoderFactory describes function that creates json encoder
-type EncoderFactory func(*bytes.Buffer) JsonEncoder
+type EncoderFactory func(*bytes.Buffer) JSONEncoder
 
 // DecoderFactory describes function that creates json decoder
-type DecoderFactory func(io.Reader) JsonDecoder
+type DecoderFactory func(io.Reader) JSONDecoder
 
 // SerializationDriver struct holds serialization / deserilization providers
 type SerializationDriver struct {
@@ -38,10 +38,10 @@ type SerializationDriver struct {
 
 // DefaultSerialization holds default stdlib json driver
 var DefaultSerialization = SerializationDriver{
-	EncoderFactory: func(b *bytes.Buffer) JsonEncoder {
+	EncoderFactory: func(b *bytes.Buffer) JSONEncoder {
 		return json.NewEncoder(b)
 	},
-	DecoderFactory: func(r io.Reader) JsonDecoder {
+	DecoderFactory: func(r io.Reader) JSONDecoder {
 		return json.NewDecoder(r)
 	},
 	Marshal:   json.Marshal,

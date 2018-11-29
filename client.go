@@ -39,7 +39,7 @@ func (c *Client) apply(r *Request, opts []CallOption) (err error) {
 func (c *Client) Read(link string, ret interface{}, opts ...CallOption) (*Response, error) {
 	buf := buffers.Get().(*bytes.Buffer)
 	buf.Reset()
-	res, err := c.method("GET", link, http.StatusOK, ret, buf, opts...)
+	res, err := c.method(http.MethodGet, link, http.StatusOK, ret, buf, opts...)
 
 	buffers.Put(buf)
 
@@ -48,7 +48,7 @@ func (c *Client) Read(link string, ret interface{}, opts ...CallOption) (*Respon
 
 // Delete resource by self link
 func (c *Client) Delete(link string, opts ...CallOption) (*Response, error) {
-	return c.method("DELETE", link, http.StatusNoContent, nil, &bytes.Buffer{}, opts...)
+	return c.method(http.MethodDelete, link, http.StatusNoContent, nil, &bytes.Buffer{}, opts...)
 }
 
 // Query resource
@@ -59,14 +59,14 @@ func (c *Client) Query(link string, query *Query, ret interface{}, opts ...CallO
 		buf = buffers.Get().(*bytes.Buffer)
 	)
 	buf.Reset()
-	defer func() { buffers.Put(buf) }()
+	defer buffers.Put(buf)
 
 	if err = Serialization.EncoderFactory(buf).Encode(query); err != nil {
 		return nil, err
 
 	}
 
-	req, err = http.NewRequest("POST", c.Url+"/"+link, buf)
+	req, err = http.NewRequest(http.MethodPost, c.Url+"/"+link, buf)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *Client) Create(link string, body, ret interface{}, opts ...CallOption) 
 		return nil, err
 	}
 	buf := bytes.NewBuffer(data)
-	return c.method("POST", link, http.StatusCreated, ret, buf, opts...)
+	return c.method(http.MethodPost, link, http.StatusCreated, ret, buf, opts...)
 }
 
 // Upsert resource
@@ -104,7 +104,7 @@ func (c *Client) Replace(link string, body, ret interface{}, opts ...CallOption)
 		return nil, err
 	}
 	buf := bytes.NewBuffer(data)
-	return c.method("PUT", link, http.StatusOK, ret, buf, opts...)
+	return c.method(http.MethodPut, link, http.StatusOK, ret, buf, opts...)
 }
 
 // Replace resource
@@ -115,7 +115,7 @@ func (c *Client) Execute(link string, body, ret interface{}, opts ...CallOption)
 		return nil, err
 	}
 	buf := bytes.NewBuffer(data)
-	return c.method("POST", link, http.StatusOK, ret, buf, opts...)
+	return c.method(http.MethodPost, link, http.StatusOK, ret, buf, opts...)
 }
 
 // Private generic method resource

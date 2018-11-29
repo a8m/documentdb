@@ -6,12 +6,12 @@ type Iterator struct {
 	err               error
 	response          *Response
 	next              bool
-	source            IteratorFN
+	source            IteratorFunc
 	db                *DocumentDB
 }
 
 // NewIterator creates iterator instance
-func NewIterator(db *DocumentDB, source IteratorFN) *Iterator {
+func NewIterator(db *DocumentDB, source IteratorFunc) *Iterator {
 	return &Iterator{
 		source: source,
 		db:     db,
@@ -44,11 +44,11 @@ func (di *Iterator) Next() bool {
 	return next
 }
 
-// IteratorFN is type that describes iterator source
-type IteratorFN func(db *DocumentDB, internalOpts ...CallOption) (*Response, error)
+// IteratorFunc is type that describes iterator source
+type IteratorFunc func(db *DocumentDB, internalOpts ...CallOption) (*Response, error)
 
 // NewDocumentIterator creates iterator source for fetching documents
-func NewDocumentIterator(coll string, query *Query, docs interface{}, opts ...CallOption) IteratorFN {
+func NewDocumentIterator(coll string, query *Query, docs interface{}, opts ...CallOption) IteratorFunc {
 	return func(db *DocumentDB, internalOpts ...CallOption) (*Response, error) {
 		return db.QueryDocuments(coll, query, docs, append(opts, internalOpts...)...)
 	}

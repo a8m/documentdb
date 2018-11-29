@@ -17,13 +17,9 @@ func NewKey(key string) *Key {
 	return &Key{Key: key}
 }
 
-var (
-	enc = base64.StdEncoding
-)
-
 func (k *Key) Salt() ([]byte, error) {
 	if len(k.salt) == 0 && k.err == nil {
-		k.salt, k.err = enc.DecodeString(k.Key)
+		k.salt, k.err = base64.StdEncoding.DecodeString(k.Key)
 		if k.err != nil {
 			if _, ok := k.err.(base64.CorruptInputError); ok {
 				k.err = errors.New("base64 input is corrupt, check CosmosDB key.")
@@ -47,6 +43,6 @@ func authorize(str []byte, key *Key) (ret string, err error) {
 	hmac.Write(str)
 	b := hmac.Sum(nil)
 
-	ret = enc.EncodeToString(b)
+	ret = base64.StdEncoding.EncodeToString(b)
 	return ret, nil
 }

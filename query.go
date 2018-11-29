@@ -7,10 +7,6 @@ type Parameter struct {
 
 type P = Parameter
 
-// func P(name, value string) Parameter {
-// 	return Parameter{name, value}
-// }
-
 type Query struct {
 	Query      string      `json:"query"`
 	Parameters []Parameter `json:"parameters"`
