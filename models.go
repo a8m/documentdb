@@ -77,7 +77,7 @@ type UDF struct {
 // PartitionKeyRange partition key range model
 type PartitionKeyRange struct {
 	Resource
-	ID           string `json:"id,omitempty"`
-	MinInclusive string `json:"minInclusive,omitempty"`
-	MaxInclusive string `json:"maxExclusive,omitempty"`
+	PartitionKeyRangeID string `json:"id,omitempty"`
+	MinInclusive        string `json:"minInclusive,omitempty"`
+	MaxInclusive        string `json:"maxExclusive,omitempty"`
 }
