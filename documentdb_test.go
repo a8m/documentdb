@@ -331,7 +331,7 @@ func TestExecuteStoredProcedure(t *testing.T) {
 func TestQueryPartitionKeyRanges(t *testing.T) {
 	expectedRanges := []PartitionKeyRange{
 		PartitionKeyRange{
-			ID: "1",
+			PartitionKeyRangeID: "1",
 		},
 	}
 	client := &ClientStub{}
