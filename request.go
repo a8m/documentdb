@@ -121,3 +121,8 @@ func formatDate(t time.Time) string {
 	t = t.UTC()
 	return t.Format("Mon, 02 Jan 2006 15:04:05 GMT")
 }
+
+type queryPartitionKeyRangesRequest struct {
+	Ranges []PartitionKeyRange `json:"PartitionKeyRanges,omitempty"`
+	Count  int                 `json:"_count,omitempty"`
+}

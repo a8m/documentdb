@@ -219,6 +219,20 @@ func (c *DocumentDB) QueryDocuments(coll string, query *Query, docs interface{},
 	return
 }
 
+// Read collection's partition ranges
+func (c *DocumentDB) QueryPartitionKeyRanges(coll string, query *Query, opts ...CallOption) (ranges []PartitionKeyRange, err error) {
+	data := queryPartitionKeyRangesRequest{}
+	if query != nil {
+		_, err = c.client.Query(coll+"pkranges/", query, &data, opts...)
+	} else {
+		_, err = c.client.Read(coll+"pkranges/", &data, opts...)
+	}
+	if ranges = data.Ranges; err != nil {
+		ranges = nil
+	}
+	return
+}
+
 // Create database
 func (c *DocumentDB) CreateDatabase(body interface{}, opts ...CallOption) (db *Database, err error) {
 	_, err = c.client.Create("dbs", body, &db, opts...)
