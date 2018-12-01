@@ -49,7 +49,7 @@ func PartitionKey(partitionKey interface{}) CallOption {
 		if err != nil {
 			return err
 		}
-		r.Header[HEADER_PARTITION_KEY] = header
+		r.Header[HeaderPartitionKey] = header
 		return nil
 	}
 }
@@ -57,7 +57,7 @@ func PartitionKey(partitionKey interface{}) CallOption {
 // Upsert if set to true, Cosmos DB creates the document with the ID (and partition key value if applicable) if it doesn’t exist, or update the document if it exists.
 func Upsert() CallOption {
 	return func(r *Request) error {
-		r.Header.Set(HEADER_UPSERT, "true")
+		r.Header.Set(HeaderUpsert, "true")
 		return nil
 	}
 }
@@ -66,7 +66,7 @@ func Upsert() CallOption {
 func Limit(limit int) CallOption {
 	header := strconv.Itoa(limit)
 	return func(r *Request) error {
-		r.Header.Set(HEADER_MAX_ITEM_COUNT, header)
+		r.Header.Set(HeaderMaxItemCount, header)
 		return nil
 	}
 }
@@ -77,7 +77,7 @@ func Continuation(continuation string) CallOption {
 		if continuation == "" {
 			return nil
 		}
-		r.Header.Set(HEADER_CONTINUATION, continuation)
+		r.Header.Set(HeaderContinuation, continuation)
 		return nil
 	}
 }
@@ -85,7 +85,7 @@ func Continuation(continuation string) CallOption {
 // ConsistencyLevel override for read options against documents and attachments. The valid values are: Strong, Bounded, Session, or Eventual (in order of strongest to weakest). The override must be the same or weaker than the account�s configured consistency level.
 func ConsistencyLevel(consistency Consistency) CallOption {
 	return func(r *Request) error {
-		r.Header.Set(HEADER_CONSISTENCY, string(consistency))
+		r.Header.Set(HeaderConsistency, string(consistency))
 		return nil
 	}
 }
@@ -93,7 +93,7 @@ func ConsistencyLevel(consistency Consistency) CallOption {
 // SessionToken a string token used with session level consistency. For more information, see
 func SessionToken(sessionToken string) CallOption {
 	return func(r *Request) error {
-		r.Header.Set(HEADER_SESSION, sessionToken)
+		r.Header.Set(HeaderSessionToken, sessionToken)
 		return nil
 	}
 }
@@ -101,7 +101,7 @@ func SessionToken(sessionToken string) CallOption {
 // CrossPartition allows query to run on all partitions
 func CrossPartition() CallOption {
 	return func(r *Request) error {
-		r.Header.Set(HEADER_CROSSPARTITION, "True")
+		r.Header.Set(HeaderCrossPartition, "True")
 		return nil
 	}
 }
@@ -110,7 +110,7 @@ func CrossPartition() CallOption {
 // (applicable only on PUT and DELETE)
 func IfMatch(etag string) CallOption {
 	return func(r *Request) error {
-		r.Header.Set(HEADER_IFMATCH, etag)
+		r.Header.Set(HeaderIfMatch, etag)
 		return nil
 	}
 }
@@ -119,7 +119,7 @@ func IfMatch(etag string) CallOption {
 // Optional (applicable only on GET)
 func IfNoneMatch(etag string) CallOption {
 	return func(r *Request) error {
-		r.Header.Set(HEADER_IF_NONE_MATCH, etag)
+		r.Header.Set(HeaderIfNonMatch, etag)
 		return nil
 	}
 }
@@ -128,7 +128,7 @@ func IfNoneMatch(etag string) CallOption {
 // Optional (applicable only on GET)
 func IfModifiedSince(date string) CallOption {
 	return func(r *Request) error {
-		r.Header.Set(HEADER_IF_MODIFIED_SINCE, date)
+		r.Header.Set(HeaderIfModifiedSince, date)
 		return nil
 	}
 }
@@ -136,7 +136,7 @@ func IfModifiedSince(date string) CallOption {
 // ChangeFeed indicates a change feed request
 func ChangeFeed() CallOption {
 	return func(r *Request) error {
-		r.Header.Set(HEADER_A_IM, "Incremental feed")
+		r.Header.Set(HeaderAIM, "Incremental feed")
 		return nil
 	}
 }
@@ -144,7 +144,7 @@ func ChangeFeed() CallOption {
 // ChangeFeedPartitionRangeID used in change feed requests. The partition key range ID for reading data.
 func ChangeFeedPartitionRangeID(id string) CallOption {
 	return func(r *Request) error {
-		r.Header.Set(HEADER_PARTITION_KEY_RANGE_ID, id)
+		r.Header.Set(HeaderPartitionKeyRangeID, id)
 		return nil
 	}
 }

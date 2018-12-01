@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// I more interested in the request, instead of the response
 type RequestRecorder struct {
 	Header http.Header
 	Body   string
@@ -70,7 +69,7 @@ func TestRead(t *testing.T) {
 	// First call
 	var db Database
 	_, err := client.Read("/dbs/b7NTAS==/", &db)
-	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
+	s.AssertHeaders(t, HeaderXDate, HeaderAuth, HeaderVersion)
 	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
@@ -88,8 +87,8 @@ func TestQuery(t *testing.T) {
 	// First call
 	var db Database
 	_, err := client.Query("dbs", &Query{Query: "SELECT * FROM ROOT r"}, &db)
-	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
-	s.AssertHeaders(t, HEADER_CONLEN, HEADER_CONTYPE, HEADER_IS_QUERY)
+	s.AssertHeaders(t, HeaderXDate, HeaderAuth, HeaderVersion)
+	s.AssertHeaders(t, HeaderContentLength, HeaderContentType, HeaderIsQuery)
 	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
@@ -108,7 +107,7 @@ func TestCreate(t *testing.T) {
 	// First call
 	var db Database
 	_, err := client.Create("dbs", `{"id": 3}`, &db)
-	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
+	s.AssertHeaders(t, HeaderXDate, HeaderAuth, HeaderVersion)
 	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
@@ -116,7 +115,7 @@ func TestCreate(t *testing.T) {
 	var doc, tDoc Document
 	tDoc.Id = "9"
 	_, err = client.Create("dbs", tDoc, &doc)
-	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
+	s.AssertHeaders(t, HeaderXDate, HeaderAuth, HeaderVersion)
 	assert.Equal(doc.Id, "9", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
@@ -134,7 +133,7 @@ func TestDelete(t *testing.T) {
 
 	// First call
 	_, err := client.Delete("/dbs/b7NTAS==/")
-	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
+	s.AssertHeaders(t, HeaderXDate, HeaderAuth, HeaderVersion)
 	assert.Nil(err, "err should be nil")
 
 	// Second Call, when StatusCode != StatusOK
@@ -152,7 +151,7 @@ func TestReplace(t *testing.T) {
 	// First call
 	var db Database
 	_, err := client.Replace("dbs", `{"id": 3}`, &db)
-	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
+	s.AssertHeaders(t, HeaderXDate, HeaderAuth, HeaderVersion)
 	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
@@ -160,7 +159,7 @@ func TestReplace(t *testing.T) {
 	var doc, tDoc Document
 	tDoc.Id = "9"
 	_, err = client.Replace("dbs", tDoc, &doc)
-	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
+	s.AssertHeaders(t, HeaderXDate, HeaderAuth, HeaderVersion)
 	assert.Equal(doc.Id, "9", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
@@ -179,7 +178,7 @@ func TestExecute(t *testing.T) {
 	// First call
 	var db Database
 	_, err := client.Execute("dbs", `{"id": 3}`, &db)
-	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
+	s.AssertHeaders(t, HeaderXDate, HeaderAuth, HeaderVersion)
 	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
@@ -187,7 +186,7 @@ func TestExecute(t *testing.T) {
 	var doc, tDoc Document
 	tDoc.Id = "9"
 	_, err = client.Execute("dbs", tDoc, &doc)
-	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
+	s.AssertHeaders(t, HeaderXDate, HeaderAuth, HeaderVersion)
 	assert.Equal(doc.Id, "9", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
