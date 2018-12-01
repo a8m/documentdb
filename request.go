@@ -10,27 +10,26 @@ import (
 )
 
 const (
-	HEADER_XDATE                  = "X-Ms-Date"
-	HEADER_AUTH                   = "Authorization"
-	HEADER_VER                    = "X-Ms-Version"
-	HEADER_CONTYPE                = "Content-Type"
-	HEADER_CONLEN                 = "Content-Length"
-	HEADER_IS_QUERY               = "X-Ms-Documentdb-Isquery"
-	HEADER_UPSERT                 = "x-ms-documentdb-is-upsert"
-	HEADER_PARTITION_KEY          = "x-ms-documentdb-partitionkey"
-	HEADER_MAX_ITEM_COUNT         = "x-ms-max-item-count"
-	HEADER_CONTINUATION           = "x-ms-continuation"
-	HEADER_CONSISTENCY            = "x-ms-consistency-level"
-	HEADER_SESSION                = "x-ms-session-token"
-	HEADER_CROSSPARTITION         = "x-ms-documentdb-query-enablecrosspartitions"
-	HEADER_IFMATCH                = "If-Match"
-	HEADER_IF_NONE_MATCH          = "If-None-Match"
-	HEADER_IF_MODIFIED_SINCE      = "If-Modified-Since"
-	HEADER_ACTIVITY_ID            = "x-ms-activity-id"
-	HEADER_SESSION_TOKEN          = "x-ms-session-token"
-	HEADER_REQUEST_CHARGE         = "x-ms-request-charge"
-	HEADER_A_IM                   = "A-IM"
-	HEADER_PARTITION_KEY_RANGE_ID = "x-ms-documentdb-partitionkeyrangeid"
+	HeaderXDate               = "X-Ms-Date"
+	HeaderAuth                = "Authorization"
+	HeaderVersion             = "X-Ms-Version"
+	HeaderContentType         = "Content-Type"
+	HeaderContentLength       = "Content-Length"
+	HeaderIsQuery             = "X-Ms-Documentdb-Isquery"
+	HeaderUpsert              = "x-ms-documentdb-is-upsert"
+	HeaderPartitionKey        = "x-ms-documentdb-partitionkey"
+	HeaderMaxItemCount        = "x-ms-max-item-count"
+	HeaderContinuation        = "x-ms-continuation"
+	HeaderConsistency         = "x-ms-consistency-level"
+	HeaderSessionToken        = "x-ms-session-token"
+	HeaderCrossPartition      = "x-ms-documentdb-query-enablecrosspartitions"
+	HeaderIfMatch             = "If-Match"
+	HeaderIfNonMatch          = "If-None-Match"
+	HeaderIfModifiedSince     = "If-Modified-Since"
+	HeaderActivityID          = "x-ms-activity-id"
+	HeaderRequestCharge       = "x-ms-request-charge"
+	HeaderAIM                 = "A-IM"
+	HeaderPartitionKeyRangeID = "x-ms-documentdb-partitionkeyrangeid"
 
 	SupportedVersion = "2017-02-22"
 )
@@ -61,8 +60,8 @@ func ResourceRequest(link string, req *http.Request) *Request {
 // Add 3 default headers to *Request
 // "x-ms-date", "x-ms-version", "authorization"
 func (req *Request) DefaultHeaders(mKey *Key) (err error) {
-	req.Header.Add(HEADER_XDATE, formatDate(time.Now()))
-	req.Header.Add(HEADER_VER, SupportedVersion)
+	req.Header.Add(HeaderXDate, formatDate(time.Now()))
+	req.Header.Add(HeaderVersion, SupportedVersion)
 
 	b := buffers.Get().(*bytes.Buffer)
 	b.Reset()
@@ -72,7 +71,7 @@ func (req *Request) DefaultHeaders(mKey *Key) (err error) {
 	b.WriteRune('\n')
 	b.WriteString(req.rId)
 	b.WriteRune('\n')
-	b.WriteString(req.Header.Get(HEADER_XDATE))
+	b.WriteString(req.Header.Get(HeaderXDate))
 	b.WriteRune('\n')
 	b.WriteString(req.Header.Get("Date"))
 	b.WriteRune('\n')
@@ -84,16 +83,16 @@ func (req *Request) DefaultHeaders(mKey *Key) (err error) {
 
 	buffers.Put(b)
 
-	req.Header.Add(HEADER_AUTH, url.QueryEscape("type=master&ver=1.0&sig="+sign))
+	req.Header.Add(HeaderAuth, url.QueryEscape("type=master&ver=1.0&sig="+sign))
 
 	return
 }
 
 // Add headers for query request
 func (req *Request) QueryHeaders(len int) {
-	req.Header.Add(HEADER_CONTYPE, "application/query+json")
-	req.Header.Add(HEADER_IS_QUERY, "true")
-	req.Header.Add(HEADER_CONLEN, string(len))
+	req.Header.Add(HeaderContentType, "application/query+json")
+	req.Header.Add(HeaderIsQuery, "true")
+	req.Header.Add(HeaderContentLength, string(len))
 }
 
 func parse(id string) (rId, rType string) {

@@ -32,9 +32,9 @@ func TestDefaultHeaders(t *testing.T) {
 	_ = req.DefaultHeaders(&Key{Key: "YXJpZWwNCg=="})
 
 	assert := assert.New(t)
-	assert.NotEqual(req.Header.Get(HEADER_AUTH), "")
-	assert.NotEqual(req.Header.Get(HEADER_XDATE), "")
-	assert.NotEqual(req.Header.Get(HEADER_VER), "")
+	assert.NotEqual(req.Header.Get(HeaderAuth), "")
+	assert.NotEqual(req.Header.Get(HeaderXDate), "")
+	assert.NotEqual(req.Header.Get(HeaderVersion), "")
 }
 
 func TestUpsertHeaders(t *testing.T) {
@@ -44,7 +44,7 @@ func TestUpsertHeaders(t *testing.T) {
 	Upsert()(req)
 
 	assert := assert.New(t)
-	assert.Equal(req.Header.Get(HEADER_UPSERT), "true")
+	assert.Equal(req.Header.Get(HeaderUpsert), "true")
 }
 
 func TestPartitionKeyMarshalJSON(t *testing.T) {
@@ -54,7 +54,7 @@ func TestPartitionKeyMarshalJSON(t *testing.T) {
 	PartitionKey(&TestPartitionKey{"test"})(req)
 
 	assert := assert.New(t)
-	assert.Equal([]string{"{\"newProp\":\"test\"}"}, req.Header[HEADER_PARTITION_KEY])
+	assert.Equal([]string{"{\"newProp\":\"test\"}"}, req.Header[HeaderPartitionKey])
 }
 
 func TestPartitionKeyAsInt(t *testing.T) {
@@ -64,7 +64,7 @@ func TestPartitionKeyAsInt(t *testing.T) {
 	PartitionKey(1)(req)
 
 	assert := assert.New(t)
-	assert.Equal([]string{"[1]"}, req.Header[HEADER_PARTITION_KEY])
+	assert.Equal([]string{"[1]"}, req.Header[HeaderPartitionKey])
 }
 
 func TestPartitionKeyAsString(t *testing.T) {
@@ -74,5 +74,5 @@ func TestPartitionKeyAsString(t *testing.T) {
 	PartitionKey("1")(req)
 
 	assert := assert.New(t)
-	assert.Equal([]string{"[\"1\"]"}, req.Header[HEADER_PARTITION_KEY])
+	assert.Equal([]string{"[\"1\"]"}, req.Header[HeaderPartitionKey])
 }
