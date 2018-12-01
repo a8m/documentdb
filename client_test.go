@@ -2,23 +2,24 @@ package documentdb
 
 import (
 	"fmt"
-	"testing"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
 // I more interested in the request, instead of the response
 type RequestRecorder struct {
-	Header	http.Header
-	Body	string
+	Header http.Header
+	Body   string
 }
 
 type MockServer struct {
 	*httptest.Server
 	RequestRecorder
-	Status	interface{}
+	Status interface{}
 }
 
 func (m *MockServer) SetStatus(status int) {
@@ -64,17 +65,17 @@ func TestRead(t *testing.T) {
 	assert := assert.New(t)
 	s := ServerFactory(`{"_colls": "colls"}`, 500)
 	defer s.Close()
-	client := &Client{Url:s.URL, Config:Config{"YXJpZWwNCg=="}}
+	client := &Client{Url: s.URL, Config: NewConfig(&Key{Key: "YXJpZWwNCg=="})}
 
 	// First call
 	var db Database
-	err := client.Read("/dbs/b7NTAS==/", &db)
+	_, err := client.Read("/dbs/b7NTAS==/", &db)
 	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
 	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
 	// Second Call, when StatusCode != StatusOK
-	err = client.Read("/dbs/b7NCAA==/colls/Ad352/", &db)
+	_, err = client.Read("/dbs/b7NCAA==/colls/Ad352/", &db)
 	assert.Equal(err.Error(), "500, DocumentDB error")
 }
 
@@ -82,18 +83,18 @@ func TestQuery(t *testing.T) {
 	assert := assert.New(t)
 	s := ServerFactory(`{"_colls": "colls"}`, 500)
 	defer s.Close()
-	client := &Client{Url:s.URL, Config:Config{"YXJpZWwNCg=="}}
+	client := &Client{Url: s.URL, Config: NewConfig(&Key{Key: "YXJpZWwNCg=="})}
 
 	// First call
 	var db Database
-	err := client.Query("dbs", "SELECT * FROM ROOT r", &db)
+	_, err := client.Query("dbs", &Query{Query: "SELECT * FROM ROOT r"}, &db)
 	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
 	s.AssertHeaders(t, HEADER_CONLEN, HEADER_CONTYPE, HEADER_IS_QUERY)
 	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
 	// Second Call, when StatusCode != StatusOK
-	err = client.Read("/dbs/b7NCAA==/colls/Ad352/", &db)
+	_, err = client.Read("/dbs/b7NCAA==/colls/Ad352/", &db)
 	assert.Equal(err.Error(), "500, DocumentDB error")
 }
 
@@ -102,11 +103,11 @@ func TestCreate(t *testing.T) {
 	s := ServerFactory(`{"_colls": "colls"}`, `{"id": "9"}`, 500)
 	s.SetStatus(http.StatusCreated)
 	defer s.Close()
-	client := &Client{Url:s.URL, Config:Config{"YXJpZWwNCg=="}}
+	client := &Client{Url: s.URL, Config: NewConfig(&Key{Key: "YXJpZWwNCg=="})}
 
 	// First call
 	var db Database
-	err := client.Create("dbs", `{"id": 3}`, &db)
+	_, err := client.Create("dbs", `{"id": 3}`, &db)
 	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
 	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
@@ -114,13 +115,13 @@ func TestCreate(t *testing.T) {
 	// Second call
 	var doc, tDoc Document
 	tDoc.Id = "9"
-	err = client.Create("dbs", tDoc, &doc)
+	_, err = client.Create("dbs", tDoc, &doc)
 	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
 	assert.Equal(doc.Id, "9", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
 	// Last Call, when StatusCode != StatusOK && StatusCreated
-	err = client.Create("dbs", tDoc, &doc)
+	_, err = client.Create("dbs", tDoc, &doc)
 	assert.Equal(err.Error(), "500, DocumentDB error")
 }
 
@@ -129,15 +130,15 @@ func TestDelete(t *testing.T) {
 	s := ServerFactory(`10`, 500)
 	s.SetStatus(http.StatusNoContent)
 	defer s.Close()
-	client := &Client{Url:s.URL, Config:Config{"YXJpZWwNCg=="}}
+	client := &Client{Url: s.URL, Config: NewConfig(&Key{Key: "YXJpZWwNCg=="})}
 
 	// First call
-	err := client.Delete("/dbs/b7NTAS==/")
+	_, err := client.Delete("/dbs/b7NTAS==/")
 	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
 	assert.Nil(err, "err should be nil")
 
 	// Second Call, when StatusCode != StatusOK
-	err = client.Delete("/dbs/b7NCAA==/colls/Ad352/")
+	_, err = client.Delete("/dbs/b7NCAA==/colls/Ad352/")
 	assert.Equal(err.Error(), "500, DocumentDB error")
 }
 
@@ -146,11 +147,11 @@ func TestReplace(t *testing.T) {
 	s := ServerFactory(`{"_colls": "colls"}`, `{"id": "9"}`, 500)
 	s.SetStatus(http.StatusOK)
 	defer s.Close()
-	client := &Client{Url:s.URL, Config:Config{"YXJpZWwNCg=="}}
+	client := &Client{Url: s.URL, Config: NewConfig(&Key{Key: "YXJpZWwNCg=="})}
 
 	// First call
 	var db Database
-	err := client.Replace("dbs", `{"id": 3}`, &db)
+	_, err := client.Replace("dbs", `{"id": 3}`, &db)
 	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
 	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
@@ -158,13 +159,13 @@ func TestReplace(t *testing.T) {
 	// Second call
 	var doc, tDoc Document
 	tDoc.Id = "9"
-	err = client.Replace("dbs", tDoc, &doc)
+	_, err = client.Replace("dbs", tDoc, &doc)
 	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
 	assert.Equal(doc.Id, "9", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
 	// Last Call, when StatusCode != StatusOK && StatusCreated
-	err = client.Replace("dbs", tDoc, &doc)
+	_, err = client.Replace("dbs", tDoc, &doc)
 	assert.Equal(err.Error(), "500, DocumentDB error")
 }
 
@@ -173,11 +174,11 @@ func TestExecute(t *testing.T) {
 	s := ServerFactory(`{"_colls": "colls"}`, `{"id": "9"}`, 500)
 	s.SetStatus(http.StatusOK)
 	defer s.Close()
-	client := &Client{Url:s.URL, Config:Config{"YXJpZWwNCg=="}}
+	client := &Client{Url: s.URL, Config: NewConfig(&Key{Key: "YXJpZWwNCg=="})}
 
 	// First call
 	var db Database
-	err := client.Execute("dbs", `{"id": 3}`, &db)
+	_, err := client.Execute("dbs", `{"id": 3}`, &db)
 	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
 	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
@@ -185,12 +186,12 @@ func TestExecute(t *testing.T) {
 	// Second call
 	var doc, tDoc Document
 	tDoc.Id = "9"
-	err = client.Execute("dbs", tDoc, &doc)
+	_, err = client.Execute("dbs", tDoc, &doc)
 	s.AssertHeaders(t, HEADER_XDATE, HEADER_AUTH, HEADER_VER)
 	assert.Equal(doc.Id, "9", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
 
 	// Last Call, when StatusCode != StatusOK && StatusCreated
-	err = client.Execute("dbs", tDoc, &doc)
+	_, err = client.Execute("dbs", tDoc, &doc)
 	assert.Equal(err.Error(), "500, DocumentDB error")
 }
