@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/a8m/documentdb-go"
+	"github.com/a8m/documentdb"
 	jsoniter "github.com/json-iterator/go"
 )
 

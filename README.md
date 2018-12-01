@@ -49,7 +49,7 @@
 #### Installation
 
 ```sh
-$ go get github.com/a8m/documentdb-go
+$ go get github.com/a8m/documentdb
 ```
 
 #### Add to your project
@@ -450,5 +450,5 @@ func main() {
 
 MIT
 
-[travis-image]: https://img.shields.io/travis/a8m/documentdb-go.svg?style=flat-square
-[travis-url]: https://travis-ci.org/a8m/documentdb-go
+[travis-image]: https://img.shields.io/travis/a8m/documentdb.svg?style=flat-square
+[travis-url]: https://travis-ci.org/a8m/documentdb
