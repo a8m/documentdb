@@ -181,7 +181,7 @@ func (c *DocumentDB) QueryDocuments(coll, query string, docs interface{}) (err e
 }
 
 // Read all documents in a collection that satisfy a query and with request options
-func (c *DocumentDB) QueryDocumentsWithRequestOptions(coll, query string, docs interface{}, requestOptions ...func(*RequestOptions)) (err error) {
+func (c *DocumentDB) QueryDocumentsWithRequestOptions(coll, query string, docs interface{}, requestOptions ...func(*RequestOptions)) (continuation string, err error) {
 	data := struct {
 		Documents interface{} `json:"Documents,omitempty"`
 		Count     int         `json:"_count,omitempty"`
@@ -189,9 +189,9 @@ func (c *DocumentDB) QueryDocumentsWithRequestOptions(coll, query string, docs i
 	// If there are request options
 	if len(requestOptions) > 0 {
 		if len(query) > 0 {
-			err = c.client.QueryWithRequestOptions(coll+"docs/", query, &data, requestOptions)
+			continuation, err = c.client.QueryWithRequestOptions(coll+"docs/", query, &data, requestOptions)
 		} else {
-			err = c.client.ReadWithRequestOptions(coll+"docs/", &data, requestOptions)
+			/* no continuation, */ err = c.client.ReadWithRequestOptions(coll+"docs/", &data, requestOptions)
 		}
 	} else {
 		if len(query) > 0 {

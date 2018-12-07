@@ -14,7 +14,7 @@ type Clienter interface {
 	ReadWithRequestOptions(link string, ret interface{}, requestOptions []func(*RequestOptions)) error
 	Delete(link string) error
 	Query(link string, query string, ret interface{}) error
-	QueryWithRequestOptions(link string, query string, ret interface{}, requestOptions []func(*RequestOptions)) error
+	QueryWithRequestOptions(link string, query string, ret interface{}, requestOptions []func(*RequestOptions)) (continuation string, err error)
 	Create(link string, body, ret interface{}) error
 	Upsert(link string, body, ret interface{}) error
 	Replace(link string, body, ret interface{}) error
@@ -69,21 +69,21 @@ func (c *Client) Query(link, query string, ret interface{}) error {
 }
 
 // Query resource with request options
-func (c *Client) QueryWithRequestOptions(link, query string, ret interface{}, requestOptions []func(*RequestOptions)) error {
+func (c *Client) QueryWithRequestOptions(link, query string, ret interface{}, requestOptions []func(*RequestOptions)) (continuation string, err error) {
 	buf := bytes.NewBufferString(querify(query))
 	req, err := http.NewRequest("POST", path(c.Url, link), buf)
 	if err != nil {
-		return err
+		return "", err
 	}
 	r := ResourceRequest(link, req)
 	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
-		return err
+		return "", err
 	}
 	if err = r.RequestOptionsHeaders(requestOptions); err != nil {
-		return err
+		return "", err
 	}
 	r.QueryHeaders(buf.Len())
-	return c.do(r, http.StatusOK, ret)
+	return c.doPaged(r, http.StatusOK, ret)
 }
 
 // Create resource
@@ -169,6 +169,40 @@ func (c *Client) do(r *Request, status int, data interface{}) error {
 		return nil
 	}
 	return readJson(resp.Body, data)
+}
+
+// Private Do function, DRY
+func (c *Client) doPaged(r *Request, status int, data interface{}) (continuation string, err error) {
+
+	/* Uncomment For debugging actual payload
+	b, err := httputil.DumpRequestOut(r.Request, true)
+	if err != nil {
+		log.Fatalf("%+v", err)
+	}
+	log.Printf("CosmosDB Request\n-------------\n%s", b)
+	*/
+	resp, err := c.Do(r.Request)
+	if err != nil {
+		return "", err
+	}
+	if resp.StatusCode != status {
+		err = &RequestError{}
+		readJson(resp.Body, &err)
+		return "", err
+	}
+	if v, ok := resp.Header["X-Ms-Continuation"]; ok {
+		continuation = v[0]
+	}
+	/* Uncomment For debugging actual payload
+	b, _ = httputil.DumpResponse(resp, true)
+	log.Printf("CosmosDB Response\n-------------\n%s", b)
+	*/
+
+	defer resp.Body.Close()
+	if data == nil {
+		return continuation, nil
+	}
+	return continuation, readJson(resp.Body, data)
 }
 
 // Generate link
