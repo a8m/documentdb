@@ -10,14 +10,16 @@ import (
 )
 
 const (
-	HEADER_XDATE         = "X-Ms-Date"
-	HEADER_AUTH          = "Authorization"
-	HEADER_VER           = "X-Ms-Version"
-	HEADER_CONTYPE       = "Content-Type"
-	HEADER_CONLEN        = "Content-Length"
-	HEADER_IS_QUERY      = "X-Ms-Documentdb-Isquery"
-	HEADER_UPSERT        = "x-ms-documentdb-is-upsert"
-	HEADER_PARTITION_KEY = "x-ms-documentdb-partitionkey"
+	HEADER_XDATE                 = "X-Ms-Date"
+	HEADER_AUTH                  = "Authorization"
+	HEADER_VER                   = "X-Ms-Version"
+	HEADER_CONTYPE               = "Content-Type"
+	HEADER_CONLEN                = "Content-Length"
+	HEADER_IS_QUERY              = "X-Ms-Documentdb-Isquery"
+	HEADER_UPSERT                = "x-ms-documentdb-is-upsert"
+	HEADER_PARTITION_KEY         = "x-ms-documentdb-partitionkey"
+	HEADER_ENABLE_CROSSPARTITION = "X-Ms-Documentdb-Query-Enablecrosspartition"
+	HEADER_X_MS_CONTINUATION     = "X-Ms-Continuation"
 )
 
 // Request Error
@@ -108,6 +110,18 @@ func (req *Request) RequestOptionsHeaders(requestOptions []func(*RequestOptions)
 
 		req.Header[HEADER_PARTITION_KEY] = []string{string(partitionKey)}
 	}
+
+	if reqOpts.EnableCrossPartition {
+		req.Header[HEADER_ENABLE_CROSSPARTITION] = []string{"true"}
+		req.Header["X-Ms-Documentdb-Query-Enable-Scan"] = []string{"true"}
+	}
+	if reqOpts.ContinuationToken != "" {
+		req.Header[HEADER_X_MS_CONTINUATION] = []string{reqOpts.ContinuationToken}
+	}
+	if reqOpts.Upsert {
+		req.Header[HEADER_UPSERT] = []string{"true"}
+	}
+
 	return
 }
 

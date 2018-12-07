@@ -7,10 +7,17 @@
 //
 package documentdb
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/pkg/errors"
+)
 
 type RequestOptions struct {
-	PartitionKey interface{}
+	PartitionKey         interface{}
+	EnableCrossPartition bool
+	ContinuationToken    string
+	Upsert               bool
 }
 
 type Config struct {
