@@ -85,7 +85,7 @@ func (req *Request) RequestOptionsHeaders(requestOptions []func(*RequestOptions)
 		requestOption(&reqOpts)
 	}
 
-	if reqOpts.PartitionKey != "" {
+	if reqOpts.PartitionKey != nil {
 		// The partition key header must be an array following the spec:
 		// https: //docs.microsoft.com/en-us/rest/api/cosmos-db/common-cosmosdb-rest-request-headers
 		// and must contain brackets
