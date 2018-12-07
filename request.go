@@ -115,7 +115,7 @@ func (req *Request) RequestOptionsHeaders(requestOptions []func(*RequestOptions)
 func (req *Request) QueryHeaders(len int) {
 	req.Header.Add(HEADER_CONTYPE, "application/query+json")
 	req.Header.Add(HEADER_IS_QUERY, "true")
-	req.Header.Add(HEADER_CONLEN, string(len))
+	//req.Header.Add(HEADER_CONLEN, string(len))
 }
 
 // Get path and return resource Id and Type
