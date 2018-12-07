@@ -210,6 +210,20 @@ func (c *DocumentDB) QueryDocumentsWithRequestOptions(coll, query string, docs i
 	return
 }
 
+// DoWithRequestOptions performs Query/Read/Update resource with request options
+func (c *DocumentDB) DoWithRequestOptions(link, method string, body interface{},
+	ret interface{}, requestOptions []func(*RequestOptions)) (continuation string, err error) {
+
+	var bodyString []byte
+	if body != nil {
+		bodyString, err = stringify(body)
+		if err != nil {
+			return "", errors.Wrap(err, "Error in marshaling request body")
+		}
+	}
+	return c.client.DoWithRequestOptions(link+"docs/", method, string(bodyString), ret, requestOptions)
+}
+
 // Create database
 func (c *DocumentDB) CreateDatabase(body interface{}) (db *Database, err error) {
 	err = c.client.Create("dbs", body, &db)

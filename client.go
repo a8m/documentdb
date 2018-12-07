@@ -15,6 +15,7 @@ type Clienter interface {
 	Delete(link string) error
 	Query(link string, query string, ret interface{}) error
 	QueryWithRequestOptions(link string, query string, ret interface{}, requestOptions []func(*RequestOptions)) (continuation string, err error)
+	DoWithRequestOptions(link, method, body string, ret interface{}, requestOptions []func(*RequestOptions)) (continuation string, err error)
 	Create(link string, body, ret interface{}) error
 	Upsert(link string, body, ret interface{}) error
 	Replace(link string, body, ret interface{}) error
@@ -83,6 +84,25 @@ func (c *Client) QueryWithRequestOptions(link, query string, ret interface{}, re
 		return "", err
 	}
 	r.QueryHeaders(buf.Len())
+	return c.doPaged(r, http.StatusOK, ret)
+}
+
+// DoWithRequestOptions performs Query/Read/Update resource with request options
+func (c *Client) DoWithRequestOptions(link, method, body string,
+	ret interface{}, requestOptions []func(*RequestOptions)) (continuation string, err error) {
+
+	buf := bytes.NewBufferString(body)
+	req, err := http.NewRequest(method, path(c.Url, link), buf)
+	if err != nil {
+		return "", err
+	}
+	r := ResourceRequest(link, req)
+	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
+		return "", err
+	}
+	if err = r.RequestOptionsHeaders(requestOptions); err != nil {
+		return "", err
+	}
 	return c.doPaged(r, http.StatusOK, ret)
 }
 
