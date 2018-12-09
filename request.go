@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -92,7 +93,7 @@ func (req *Request) DefaultHeaders(mKey *Key) (err error) {
 func (req *Request) QueryHeaders(len int) {
 	req.Header.Add(HeaderContentType, "application/query+json")
 	req.Header.Add(HeaderIsQuery, "true")
-	req.Header.Add(HeaderContentLength, string(len))
+	req.Header.Add(HeaderContentLength, strconv.Itoa(len))
 }
 
 func parse(id string) (rId, rType string) {
