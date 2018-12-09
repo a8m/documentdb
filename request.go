@@ -23,7 +23,7 @@ const (
 	HeaderContinuation        = "x-ms-continuation"
 	HeaderConsistency         = "x-ms-consistency-level"
 	HeaderSessionToken        = "x-ms-session-token"
-	HeaderCrossPartition      = "x-ms-documentdb-query-enablecrosspartitions"
+	HeaderCrossPartition      = "x-ms-documentdb-query-enablecrosspartition"
 	HeaderIfMatch             = "If-Match"
 	HeaderIfNonMatch          = "If-None-Match"
 	HeaderIfModifiedSince     = "If-Modified-Since"
