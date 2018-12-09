@@ -94,7 +94,12 @@ func (c *Client) Create(link string, body, ret interface{}, opts ...CallOption) 
 // Upsert resource
 func (c *Client) Upsert(link string, body, ret interface{}, opts ...CallOption) (*Response, error) {
 	opts = append(opts, Upsert())
-	return c.Create(link, body, ret, opts...)
+	data, err := stringify(body)
+	if err != nil {
+		return nil, err
+	}
+	buf := bytes.NewBuffer(data)
+	return c.method(http.MethodPost, link, http.StatusOK, ret, buf, opts...)
 }
 
 // Replace resource
