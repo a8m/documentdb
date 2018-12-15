@@ -9,7 +9,7 @@ type P = Parameter
 
 type Query struct {
 	Query      string      `json:"query"`
-	Parameters []Parameter `json:"parameters"`
+	Parameters []Parameter `json:"parameters,omitempty"`
 }
 
 func NewQuery(query string, parameters ...Parameter) *Query {
