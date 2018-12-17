@@ -22,7 +22,7 @@ type Client struct {
 	http.Client
 }
 
-func (c *Client) apply(r *Request, opts []CallOption) (err error) {
+func (c *Client) apply(r *Request, opts []CallOption) (err error) { 
 	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (c *Client) apply(r *Request, opts []CallOption) (err error) {
 func (c *Client) Read(link string, ret interface{}, opts ...CallOption) (*Response, error) {
 	buf := buffers.Get().(*bytes.Buffer)
 	buf.Reset()
-	res, err := c.method(http.MethodGet, link, http.StatusOK, ret, buf, opts...)
+	res, err := c.method(http.MethodGet, link, expectStatusCode(http.StatusOK), ret, buf, opts...)
 
 	buffers.Put(buf)
 
@@ -48,7 +48,7 @@ func (c *Client) Read(link string, ret interface{}, opts ...CallOption) (*Respon
 
 // Delete resource by self link
 func (c *Client) Delete(link string, opts ...CallOption) (*Response, error) {
-	return c.method(http.MethodDelete, link, http.StatusNoContent, nil, &bytes.Buffer{}, opts...)
+	return c.method(http.MethodDelete, link, expectStatusCode(http.StatusNoContent), nil, &bytes.Buffer{}, opts...)
 }
 
 // Query resource
@@ -78,7 +78,7 @@ func (c *Client) Query(link string, query *Query, ret interface{}, opts ...CallO
 
 	r.QueryHeaders(buf.Len())
 
-	return c.do(r, http.StatusOK, ret)
+	return c.do(r, expectStatusCode(http.StatusOK), ret)
 }
 
 // Create resource
@@ -88,7 +88,7 @@ func (c *Client) Create(link string, body, ret interface{}, opts ...CallOption) 
 		return nil, err
 	}
 	buf := bytes.NewBuffer(data)
-	return c.method(http.MethodPost, link, http.StatusCreated, ret, buf, opts...)
+	return c.method(http.MethodPost, link, expectStatusCode(http.StatusCreated), ret, buf, opts...)
 }
 
 // Upsert resource
@@ -99,7 +99,7 @@ func (c *Client) Upsert(link string, body, ret interface{}, opts ...CallOption) 
 		return nil, err
 	}
 	buf := bytes.NewBuffer(data)
-	return c.method(http.MethodPost, link, http.StatusOK, ret, buf, opts...)
+	return c.method(http.MethodPost, link, expectStatusCodeXX(http.StatusOK), ret, buf, opts...)
 }
 
 // Replace resource
@@ -109,7 +109,7 @@ func (c *Client) Replace(link string, body, ret interface{}, opts ...CallOption)
 		return nil, err
 	}
 	buf := bytes.NewBuffer(data)
-	return c.method(http.MethodPut, link, http.StatusOK, ret, buf, opts...)
+	return c.method(http.MethodPut, link, expectStatusCode(http.StatusOK), ret, buf, opts...)
 }
 
 // Replace resource
@@ -120,11 +120,11 @@ func (c *Client) Execute(link string, body, ret interface{}, opts ...CallOption)
 		return nil, err
 	}
 	buf := bytes.NewBuffer(data)
-	return c.method(http.MethodPost, link, http.StatusOK, ret, buf, opts...)
+	return c.method(http.MethodPost, link, expectStatusCode(http.StatusOK), ret, buf, opts...)
 }
 
 // Private generic method resource
-func (c *Client) method(method string, link string, status int, ret interface{}, body *bytes.Buffer, opts ...CallOption) (*Response, error) {
+func (c *Client) method(method string, link string, validator statusCodeValidatorFunc, ret interface{}, body *bytes.Buffer, opts ...CallOption) (*Response, error) {
 	req, err := http.NewRequest(method, c.Url+"/"+link, body)
 	if err != nil {
 		return nil, err
@@ -136,16 +136,16 @@ func (c *Client) method(method string, link string, status int, ret interface{},
 		return nil, err
 	}
 
-	return c.do(r, status, ret)
+	return c.do(r, validator, ret)
 }
 
 // Private Do function, DRY
-func (c *Client) do(r *Request, status int, data interface{}) (*Response, error) {
+func (c *Client) do(r *Request, validator statusCodeValidatorFunc, data interface{}) (*Response, error) {
 	resp, err := c.Do(r.Request)
 	if err != nil {
 		return nil, err
 	}
-	if resp.StatusCode != status {
+	if !validator(resp.StatusCode) {
 		err = &RequestError{}
 		readJson(resp.Body, &err)
 		return nil, err
