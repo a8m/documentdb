@@ -22,7 +22,7 @@ type Client struct {
 	http.Client
 }
 
-func (c *Client) apply(r *Request, opts []CallOption) (err error) {
+func (c *Client) apply(r *Request, opts []CallOption) (err error) { 
 	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func (c *Client) Upsert(link string, body, ret interface{}, opts ...CallOption) 
 		return nil, err
 	}
 	buf := bytes.NewBuffer(data)
-	return c.method(http.MethodPost, link, expectStatusCodeXX(http.StatusCreated), ret, buf, opts...)
+	return c.method(http.MethodPost, link, expectStatusCodeXX(http.StatusOK), ret, buf, opts...)
 }
 
 // Replace resource

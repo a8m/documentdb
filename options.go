@@ -101,7 +101,7 @@ func SessionToken(sessionToken string) CallOption {
 // CrossPartition allows query to run on all partitions
 func CrossPartition() CallOption {
 	return func(r *Request) error {
-		r.Header.Set(HeaderCrossPartition, "True")
+		r.Header.Set(HeaderCrossPartition, "true")
 		return nil
 	}
 }
