@@ -448,7 +448,7 @@ func main() {
 
 ### License
 
-MIT
+Distributed under the MIT license, which is available in the file LICENSE.
 
 [travis-image]: https://img.shields.io/travis/a8m/documentdb.svg?style=flat-square
 [travis-url]: https://travis-ci.org/a8m/documentdb
