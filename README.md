@@ -60,11 +60,15 @@ import (
 )
 
 func main() {
-	client := documentdb.New("connection-url", documentdb.Config{"master-key"})
+	config := documentdb.NewConfig(&documentdb.Key{
+		Key: "master-key",
+	})
+	client := documentdb.New("connection-url", config)
+
 	// Start using DocumentDB
 	dbs, err := client.ReadDatabases()
 	if err != nil {
-	  log.Fatal(err)
+		log.Fatal(err)
 	}
 	fmt.Println(dbs)
 }
