@@ -10,16 +10,16 @@ type Consistency string
 
 const (
 	// Strong consistency level
-	Strong Consistency = "strong"
+	Strong Consistency = "Strong"
 
 	// Bounded consistency level
-	Bounded Consistency = "bounded"
+	Bounded Consistency = "Bounded"
 
 	// Session consistency level
-	Session Consistency = "session"
+	Session Consistency = "Session"
 
 	// Eventual consistency level
-	Eventual Consistency = "eventual"
+	Eventual Consistency = "Eventual"
 )
 
 // CallOption function
