@@ -12,6 +12,8 @@ import (
 	"net/http"
 	"reflect"
 	"sync"
+
+	"github.com/Azure/go-autorest/autorest/adal"
 )
 
 var buffers = &sync.Pool{
@@ -34,6 +36,7 @@ func DefaultIdentificationHydrator(config *Config, doc interface{}) {
 
 type Config struct {
 	MasterKey                  *Key
+	ServicePrincipal           *adal.ServicePrincipalToken
 	Client                     http.Client
 	IdentificationHydrator     IdentificationHydrator
 	IdentificationPropertyName string
@@ -42,6 +45,15 @@ type Config struct {
 func NewConfig(key *Key) *Config {
 	return &Config{
 		MasterKey:                  key,
+		IdentificationHydrator:     DefaultIdentificationHydrator,
+		IdentificationPropertyName: "Id",
+	}
+}
+
+// NewConfigWithServicePrincipal creates a new Config object that uses Azure AD (via a service principal) for authentication
+func NewConfigWithServicePrincipal(servicePrincipal *adal.ServicePrincipalToken) *Config {
+	return &Config{
+		ServicePrincipal:           servicePrincipal,
 		IdentificationHydrator:     DefaultIdentificationHydrator,
 		IdentificationPropertyName: "Id",
 	}
