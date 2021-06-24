@@ -449,7 +449,7 @@ func main() {
 
 ### Authentication with Azure AD
 
-You can authenticate with Cosmos DB using Azure AD and a service principal, including full RBAC support. To configure Cosmos DB to use Azure AD, take a look at the [Cosmos DB documentation](https://docs.microsoft.com/en-us/azure/cosmos-db/how-to-setup-rbac#role-assignments).
+You can authenticate with Cosmos DB using Azure AD and a service principal, including full RBAC support. To configure Cosmos DB to use Azure AD, take a look at the [Cosmos DB documentation](https://docs.microsoft.com/en-us/azure/cosmos-db/how-to-setup-rbac).
 
 To use this library with a service principal:
 
