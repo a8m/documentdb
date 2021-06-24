@@ -1,6 +1,7 @@
 module github.com/a8m/documentdb
 
 require (
+	github.com/Azure/go-autorest/autorest/adal v0.9.14
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/json-iterator/go v1.1.5
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect

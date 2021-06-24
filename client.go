@@ -22,8 +22,8 @@ type Client struct {
 	http.Client
 }
 
-func (c *Client) apply(r *Request, opts []CallOption) (err error) { 
-	if err = r.DefaultHeaders(c.Config.MasterKey); err != nil {
+func (c *Client) apply(r *Request, opts []CallOption) (err error) {
+	if err = r.DefaultHeaders(c.Config); err != nil {
 		return err
 	}
 

@@ -41,8 +41,9 @@
   * [Create](#createuserdefinedfunction)
   * [Replace](#replaceuserdefinedfunction)
   * [Delete](#deleteuserdefinedfunction)
- * [Iterator](#iterator)
+* [Iterator](#iterator)
   * [DocumentIterator](#documentIterator)
+* [Authentication with Azure AD](#authenticationwithazuread)
 
 ### Get Started
 
@@ -443,6 +444,39 @@ func main() {
 	}    
 
 	// ...
+}
+```
+
+### Authentication with Azure AD
+
+You can authenticate with Cosmos DB using Azure AD and a service principal, including full RBAC support. To configure Cosmos DB to use Azure AD, take a look at the [Cosmos DB documentation](https://docs.microsoft.com/en-us/azure/cosmos-db/how-to-setup-rbac).
+
+To use this library with a service principal:
+
+```go
+import (
+	"github.com/Azure/go-autorest/autorest/adal"
+	"github.com/a8m/documentdb"
+)
+
+func main() {
+	// Azure AD application (service principal) client credentials
+	tenantId := "tenant-id"
+	clientId := "client-id"
+	clientSecret := "client-secret"
+
+	// Azure AD endpoint may be different for sovereign clouds
+	oauthConfig, err := adal.NewOAuthConfig("https://login.microsoftonline.com/", tenantId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	spt, err := adal.NewServicePrincipalToken(*oauthConfig, clientId, clientSecret, "https://cosmos.azure.com") // Always "https://cosmos.azure.com"
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	config := documentdb.NewConfigWithServicePrincipal(spt)
+	client := documentdb.New("connection-url", config)
 }
 ```
 

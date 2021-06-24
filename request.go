@@ -60,31 +60,41 @@ func ResourceRequest(link string, req *http.Request) *Request {
 
 // Add 3 default headers to *Request
 // "x-ms-date", "x-ms-version", "authorization"
-func (req *Request) DefaultHeaders(mKey *Key) (err error) {
+func (req *Request) DefaultHeaders(config *Config) (err error) {
 	req.Header.Add(HeaderXDate, formatDate(time.Now()))
 	req.Header.Add(HeaderVersion, SupportedVersion)
 
-	b := buffers.Get().(*bytes.Buffer)
-	b.Reset()
-	b.WriteString(req.Method)
-	b.WriteRune('\n')
-	b.WriteString(req.rType)
-	b.WriteRune('\n')
-	b.WriteString(req.rId)
-	b.WriteRune('\n')
-	b.WriteString(req.Header.Get(HeaderXDate))
-	b.WriteRune('\n')
-	b.WriteString(req.Header.Get("Date"))
-	b.WriteRune('\n')
+	// Authentication via master key
+	if config.MasterKey != nil && config.MasterKey.Key != "" {
+		b := buffers.Get().(*bytes.Buffer)
+		b.Reset()
+		b.WriteString(req.Method)
+		b.WriteRune('\n')
+		b.WriteString(req.rType)
+		b.WriteRune('\n')
+		b.WriteString(req.rId)
+		b.WriteRune('\n')
+		b.WriteString(req.Header.Get(HeaderXDate))
+		b.WriteRune('\n')
+		b.WriteString(req.Header.Get("Date"))
+		b.WriteRune('\n')
 
-	sign, err := authorize(bytes.ToLower(b.Bytes()), mKey)
-	if err != nil {
-		return err
+		sign, err := authorize(bytes.ToLower(b.Bytes()), config.MasterKey)
+		if err != nil {
+			return err
+		}
+
+		buffers.Put(b)
+
+		req.Header.Add(HeaderAuth, url.QueryEscape("type=master&ver=1.0&sig="+sign))
+	} else if config.ServicePrincipal != nil {
+		err := config.ServicePrincipal.EnsureFresh()
+		if err != nil {
+			return err
+		}
+		token := config.ServicePrincipal.OAuthToken()
+		req.Header.Add(HeaderAuth, url.QueryEscape("type=aad&ver=1.0&sig="+token))
 	}
-
-	buffers.Put(b)
-
-	req.Header.Add(HeaderAuth, url.QueryEscape("type=master&ver=1.0&sig="+sign))
 
 	return
 }
