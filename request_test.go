@@ -29,7 +29,7 @@ func TestResourceRequest(t *testing.T) {
 func TestDefaultHeaders(t *testing.T) {
 	r, _ := http.NewRequest("GET", "link", &bytes.Buffer{})
 	req := ResourceRequest("/dbs/b5NCAA==/", r)
-	_ = req.DefaultHeaders(&Key{Key: "YXJpZWwNCg=="})
+	_ = req.DefaultHeaders(&Config{MasterKey: &Key{Key: "YXJpZWwNCg=="}})
 
 	assert := assert.New(t)
 	assert.NotEqual(req.Header.Get(HeaderAuth), "")
