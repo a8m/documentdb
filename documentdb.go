@@ -12,8 +12,6 @@ import (
 	"net/http"
 	"reflect"
 	"sync"
-
-	"github.com/Azure/go-autorest/autorest/adal"
 )
 
 var buffers = &sync.Pool{
@@ -36,7 +34,7 @@ func DefaultIdentificationHydrator(config *Config, doc interface{}) {
 
 type Config struct {
 	MasterKey                  *Key
-	ServicePrincipal           *adal.ServicePrincipalToken
+	ServicePrincipal           ServicePrincipalProvider
 	Client                     http.Client
 	IdentificationHydrator     IdentificationHydrator
 	IdentificationPropertyName string
@@ -51,7 +49,7 @@ func NewConfig(key *Key) *Config {
 }
 
 // NewConfigWithServicePrincipal creates a new Config object that uses Azure AD (via a service principal) for authentication
-func NewConfigWithServicePrincipal(servicePrincipal *adal.ServicePrincipalToken) *Config {
+func NewConfigWithServicePrincipal(servicePrincipal ServicePrincipalProvider) *Config {
 	return &Config{
 		ServicePrincipal:           servicePrincipal,
 		IdentificationHydrator:     DefaultIdentificationHydrator,
@@ -359,4 +357,13 @@ func (c *DocumentDB) ReplaceUserDefinedFunction(link string, body interface{}, o
 func (c *DocumentDB) ExecuteStoredProcedure(link string, params, body interface{}, opts ...CallOption) (err error) {
 	_, err = c.client.Execute(link, params, &body, opts...)
 	return
+}
+
+// ServicePrincipalProvider is an interface for an object that provides an Azure service principal
+// It's normally used with *adal.ServicePrincipalToken objects from github.com/Azure/go-autorest/autorest/adal
+type ServicePrincipalProvider interface {
+	// EnsureFresh will refresh the token if it will expire within the refresh window. This method is safe for concurrent use.
+	EnsureFresh() error
+	// OAuthToken returns the current access token.
+	OAuthToken() string
 }
