@@ -252,6 +252,18 @@ func TestCreateDocument(t *testing.T) {
 	assert.NotEqual(t, doc.Id, "")
 }
 
+func TestCreateDocumentWithAppIdentifier(t *testing.T) {
+	client := &ClientStub{}
+	defaultConfig.WithAppIdentifier("documentdb_test.TestCreateDocumentWithAppIdentifier")
+	c := &DocumentDB{client, defaultConfig}
+	// TODO: test error situation, without id, etc...
+	var doc Document
+	client.On("Create", "dbs/colls/docs/", &doc).Return(nil)
+	c.CreateDocument("dbs/colls/", &doc)
+	client.AssertCalled(t, "Create", "dbs/colls/docs/", &doc)
+	assert.NotEqual(t, doc.Id, "")
+}
+
 func TestUpsertDocument(t *testing.T) {
 	client := &ClientStub{}
 	c := &DocumentDB{client, defaultConfig}

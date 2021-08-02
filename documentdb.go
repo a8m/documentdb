@@ -38,6 +38,7 @@ type Config struct {
 	Client                     http.Client
 	IdentificationHydrator     IdentificationHydrator
 	IdentificationPropertyName string
+	AppIdentifier              string
 }
 
 func NewConfig(key *Key) *Config {
@@ -60,6 +61,11 @@ func NewConfigWithServicePrincipal(servicePrincipal ServicePrincipalProvider) *C
 // WithClient stores given http client for later use by documentdb client.
 func (c *Config) WithClient(client http.Client) *Config {
 	c.Client = client
+	return c
+}
+
+func (c *Config) WithAppIdentifier(appIdentifier string) *Config {
+	c.AppIdentifier = appIdentifier
 	return c
 }
 
