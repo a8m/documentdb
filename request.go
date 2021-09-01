@@ -33,9 +33,6 @@ const (
 	HeaderPartitionKeyRangeID = "x-ms-documentdb-partitionkeyrangeid"
 	HeaderUserAgent           = "User-Agent"
 
-	ClientName    = "documentdb-go"
-	ClientVersion = "1.3.0"
-
 	SupportedVersion = "2017-02-22"
 )
 
@@ -64,10 +61,10 @@ func ResourceRequest(link string, req *http.Request) *Request {
 
 // Add 3 default headers to *Request
 // "x-ms-date", "x-ms-version", "authorization"
-func (req *Request) DefaultHeaders(config *Config) (err error) {
+func (req *Request) DefaultHeaders(config *Config, userAgent string) (err error) {
 	req.Header.Add(HeaderXDate, formatDate(time.Now()))
 	req.Header.Add(HeaderVersion, SupportedVersion)
-	req.Header.Add(HeaderUserAgent, strings.Join([]string{ClientName, "/", ClientVersion, " ", config.AppIdentifier}, ""))
+	req.Header.Add(HeaderUserAgent, userAgent)
 
 	// Authentication via master key
 	if config.MasterKey != nil && config.MasterKey.Key != "" {

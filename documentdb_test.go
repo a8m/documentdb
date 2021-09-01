@@ -256,7 +256,6 @@ func TestCreateDocumentWithAppIdentifier(t *testing.T) {
 	client := &ClientStub{}
 	defaultConfig.WithAppIdentifier("documentdb_test.TestCreateDocumentWithAppIdentifier")
 	c := &DocumentDB{client, defaultConfig}
-	// TODO: test error situation, without id, etc...
 	var doc Document
 	client.On("Create", "dbs/colls/docs/", &doc).Return(nil)
 	c.CreateDocument("dbs/colls/", &doc)

@@ -78,22 +78,21 @@ func TestRead(t *testing.T) {
 	assert.Equal(err.Error(), "500, DocumentDB error")
 }
 
-func TestReadWithAppIdentifier(t *testing.T) {
+func TestReadWithUserAgent(t *testing.T) {
 	assert := assert.New(t)
 	s := ServerFactory(`{"_colls": "colls"}`, 500)
+	testUserAgent := "test/user agent"
 	defer s.Close()
-	client := &Client{Url: s.URL, Config: NewConfig(&Key{Key: "YXJpZWwNCg=="}).WithAppIdentifier("client_test.TestReadWithAppIdentifier")}
+	client := &Client{Url: s.URL, Config: NewConfig(&Key{Key: "YXJpZWwNCg=="})}
+	client.UserAgent = testUserAgent
 
 	// First call
 	var db Database
 	_, err := client.Read("/dbs/b7NTAS==/", &db)
 	s.AssertHeaders(t, HeaderXDate, HeaderAuth, HeaderVersion, HeaderUserAgent)
+	assert.Equal(s.Header.Get(HeaderUserAgent), testUserAgent)
 	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
 	assert.Nil(err, "err should be nil")
-
-	// Second Call, when StatusCode != StatusOK
-	_, err = client.Read("/dbs/b7NCAA==/colls/Ad352/", &db)
-	assert.Equal(err.Error(), "500, DocumentDB error")
 }
 
 func TestQuery(t *testing.T) {
