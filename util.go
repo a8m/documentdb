@@ -22,8 +22,12 @@ func uuid() string {
 
 func ReadClientVersion() string {
 	info, ok := debug.ReadBuildInfo()
-	if !ok {
-		return "0.0.0"
+	if ok {
+		for _, d := range info.Deps {
+			if d.Path == "github.com/a8m/documentdb" {
+				return d.Version
+			}
+		}
 	}
-	return info.Main.Version
+	return "0.0.0"
 }
