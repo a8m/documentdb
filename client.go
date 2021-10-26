@@ -20,10 +20,11 @@ type Client struct {
 	Url    string
 	Config *Config
 	http.Client
+	UserAgent string
 }
 
 func (c *Client) apply(r *Request, opts []CallOption) (err error) {
-	if err = r.DefaultHeaders(c.Config); err != nil {
+	if err = r.DefaultHeaders(c.Config, c.UserAgent); err != nil {
 		return err
 	}
 

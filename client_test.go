@@ -78,6 +78,23 @@ func TestRead(t *testing.T) {
 	assert.Equal(err.Error(), "500, DocumentDB error")
 }
 
+func TestReadWithUserAgent(t *testing.T) {
+	assert := assert.New(t)
+	s := ServerFactory(`{"_colls": "colls"}`, 500)
+	testUserAgent := "test/user agent"
+	defer s.Close()
+	client := &Client{Url: s.URL, Config: NewConfig(&Key{Key: "YXJpZWwNCg=="})}
+	client.UserAgent = testUserAgent
+
+	// First call
+	var db Database
+	_, err := client.Read("/dbs/b7NTAS==/", &db)
+	s.AssertHeaders(t, HeaderXDate, HeaderAuth, HeaderVersion, HeaderUserAgent)
+	assert.Equal(s.Header.Get(HeaderUserAgent), testUserAgent)
+	assert.Equal(db.Colls, "colls", "Should fill the fields from response body")
+	assert.Nil(err, "err should be nil")
+}
+
 func TestQuery(t *testing.T) {
 	assert := assert.New(t)
 	s := ServerFactory(`{"_colls": "colls"}`, 500)

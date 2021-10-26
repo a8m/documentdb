@@ -27,14 +27,17 @@ func TestResourceRequest(t *testing.T) {
 }
 
 func TestDefaultHeaders(t *testing.T) {
+	testUserAgent := "test/user agent"
+
 	r, _ := http.NewRequest("GET", "link", &bytes.Buffer{})
 	req := ResourceRequest("/dbs/b5NCAA==/", r)
-	_ = req.DefaultHeaders(&Config{MasterKey: &Key{Key: "YXJpZWwNCg=="}})
+	_ = req.DefaultHeaders(&Config{MasterKey: &Key{Key: "YXJpZWwNCg=="}}, testUserAgent)
 
 	assert := assert.New(t)
 	assert.NotEqual(req.Header.Get(HeaderAuth), "")
 	assert.NotEqual(req.Header.Get(HeaderXDate), "")
 	assert.NotEqual(req.Header.Get(HeaderVersion), "")
+	assert.Equal(req.Header.Get(HeaderUserAgent), testUserAgent)
 }
 
 func TestUpsertHeaders(t *testing.T) {

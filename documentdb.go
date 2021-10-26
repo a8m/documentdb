@@ -11,7 +11,12 @@ import (
 	"bytes"
 	"net/http"
 	"reflect"
+	"strings"
 	"sync"
+)
+
+const (
+	ClientName = "documentdb-go"
 )
 
 var buffers = &sync.Pool{
@@ -38,6 +43,7 @@ type Config struct {
 	Client                     http.Client
 	IdentificationHydrator     IdentificationHydrator
 	IdentificationPropertyName string
+	AppIdentifier              string
 }
 
 func NewConfig(key *Key) *Config {
@@ -63,6 +69,11 @@ func (c *Config) WithClient(client http.Client) *Config {
 	return c
 }
 
+func (c *Config) WithAppIdentifier(appIdentifier string) *Config {
+	c.AppIdentifier = appIdentifier
+	return c
+}
+
 type DocumentDB struct {
 	client Clienter
 	config *Config
@@ -75,6 +86,7 @@ func New(url string, config *Config) *DocumentDB {
 	}
 	client.Url = url
 	client.Config = config
+	client.UserAgent = strings.Join([]string{ClientName, "/", ReadClientVersion(), " ", config.AppIdentifier}, "")
 	return &DocumentDB{client: client, config: config}
 }
 
