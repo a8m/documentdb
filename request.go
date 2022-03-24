@@ -2,6 +2,7 @@ package documentdb
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -34,6 +35,8 @@ const (
 	HeaderUserAgent           = "User-Agent"
 
 	SupportedVersion = "2017-02-22"
+
+	ServicePrincipalRefreshTimeout = 10 * time.Second
 )
 
 // Request Error
@@ -90,7 +93,9 @@ func (req *Request) DefaultHeaders(config *Config, userAgent string) (err error)
 
 		req.Header.Add(HeaderAuth, url.QueryEscape("type=master&ver=1.0&sig="+sign))
 	} else if config.ServicePrincipal != nil {
-		err := config.ServicePrincipal.EnsureFresh()
+		ctx, cancel := context.WithTimeout(context.Background(), ServicePrincipalRefreshTimeout)
+		defer cancel()
+		err := config.ServicePrincipal.EnsureFreshWithContext(ctx)
 		if err != nil {
 			return err
 		}

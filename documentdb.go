@@ -9,6 +9,8 @@ package documentdb
 
 import (
 	"bytes"
+	"context"
+	"errors"
 	"net/http"
 	"reflect"
 	"strings"
@@ -117,6 +119,10 @@ func (c *DocumentDB) ReadDocument(link string, doc interface{}, opts ...CallOpti
 
 // Read sporc by self link
 func (c *DocumentDB) ReadStoredProcedure(link string, opts ...CallOption) (sproc *Sproc, err error) {
+	if c.usesAAD() {
+		return nil, errors.New("cannot perform CRUD operatons on stored procedures while authenticating with Azure AD")
+	}
+
 	_, err = c.client.Read(link, &sproc, opts...)
 	if err != nil {
 		return nil, err
@@ -126,6 +132,10 @@ func (c *DocumentDB) ReadStoredProcedure(link string, opts ...CallOption) (sproc
 
 // Read udf by self link
 func (c *DocumentDB) ReadUserDefinedFunction(link string, opts ...CallOption) (udf *UDF, err error) {
+	if c.usesAAD() {
+		return nil, errors.New("cannot perform CRUD operatons on UDFs while authenticating with Azure AD")
+	}
+
 	_, err = c.client.Read(link, &udf, opts...)
 	if err != nil {
 		return nil, err
@@ -145,11 +155,19 @@ func (c *DocumentDB) ReadCollections(db string, opts ...CallOption) (colls []Col
 
 // Read all sprocs by collection self link
 func (c *DocumentDB) ReadStoredProcedures(coll string, opts ...CallOption) (sprocs []Sproc, err error) {
+	if c.usesAAD() {
+		return nil, errors.New("cannot perform CRUD operatons on stored procedures while authenticating with Azure AD")
+	}
+
 	return c.QueryStoredProcedures(coll, nil, opts...)
 }
 
 // Read pall udfs by collection self link
 func (c *DocumentDB) ReadUserDefinedFunctions(coll string, opts ...CallOption) (udfs []UDF, err error) {
+	if c.usesAAD() {
+		return nil, errors.New("cannot perform CRUD operatons on UDFs while authenticating with Azure AD")
+	}
+
 	return c.QueryUserDefinedFunctions(coll, nil, opts...)
 }
 
@@ -195,6 +213,10 @@ func (c *DocumentDB) QueryCollections(db string, query *Query, opts ...CallOptio
 
 // Read all collection `sprocs` that satisfy a query
 func (c *DocumentDB) QueryStoredProcedures(coll string, query *Query, opts ...CallOption) (sprocs []Sproc, err error) {
+	if c.usesAAD() {
+		return nil, errors.New("cannot perform CRUD operatons on stored procedures while authenticating with Azure AD")
+	}
+
 	data := struct {
 		Sprocs []Sproc `json:"StoredProcedures,omitempty"`
 		Count  int     `json:"_count,omitempty"`
@@ -212,6 +234,10 @@ func (c *DocumentDB) QueryStoredProcedures(coll string, query *Query, opts ...Ca
 
 // Read all collection `udfs` that satisfy a query
 func (c *DocumentDB) QueryUserDefinedFunctions(coll string, query *Query, opts ...CallOption) (udfs []UDF, err error) {
+	if c.usesAAD() {
+		return nil, errors.New("cannot perform CRUD operatons on UDFs while authenticating with Azure AD")
+	}
+
 	data := struct {
 		Udfs  []UDF `json:"UserDefinedFunctions,omitempty"`
 		Count int   `json:"_count,omitempty"`
@@ -275,6 +301,10 @@ func (c *DocumentDB) CreateCollection(db string, body interface{}, opts ...CallO
 
 // Create stored procedure
 func (c *DocumentDB) CreateStoredProcedure(coll string, body interface{}, opts ...CallOption) (sproc *Sproc, err error) {
+	if c.usesAAD() {
+		return nil, errors.New("cannot perform CRUD operatons on stored procedures while authenticating with Azure AD")
+	}
+
 	_, err = c.client.Create(coll+"sprocs/", body, &sproc, opts...)
 	if err != nil {
 		return nil, err
@@ -284,6 +314,10 @@ func (c *DocumentDB) CreateStoredProcedure(coll string, body interface{}, opts .
 
 // Create user defined function
 func (c *DocumentDB) CreateUserDefinedFunction(coll string, body interface{}, opts ...CallOption) (udf *UDF, err error) {
+	if c.usesAAD() {
+		return nil, errors.New("cannot perform CRUD operatons on UDFs while authenticating with Azure AD")
+	}
+
 	_, err = c.client.Create(coll+"udfs/", body, &udf, opts...)
 	if err != nil {
 		return nil, err
@@ -325,11 +359,19 @@ func (c *DocumentDB) DeleteDocument(link string, opts ...CallOption) (*Response,
 
 // Delete stored procedure
 func (c *DocumentDB) DeleteStoredProcedure(link string, opts ...CallOption) (*Response, error) {
+	if c.usesAAD() {
+		return nil, errors.New("cannot perform CRUD operatons on stored procedures while authenticating with Azure AD")
+	}
+
 	return c.client.Delete(link, opts...)
 }
 
 // Delete user defined function
 func (c *DocumentDB) DeleteUserDefinedFunction(link string, opts ...CallOption) (*Response, error) {
+	if c.usesAAD() {
+		return nil, errors.New("cannot perform CRUD operatons on UDFs while authenticating with Azure AD")
+	}
+
 	return c.client.Delete(link, opts...)
 }
 
@@ -349,6 +391,10 @@ func (c *DocumentDB) ReplaceDocument(link string, doc interface{}, opts ...CallO
 
 // Replace stored procedure
 func (c *DocumentDB) ReplaceStoredProcedure(link string, body interface{}, opts ...CallOption) (sproc *Sproc, err error) {
+	if c.usesAAD() {
+		return nil, errors.New("cannot perform CRUD operatons on stored procedures while authenticating with Azure AD")
+	}
+
 	_, err = c.client.Replace(link, body, &sproc, opts...)
 	if err != nil {
 		return nil, err
@@ -358,6 +404,10 @@ func (c *DocumentDB) ReplaceStoredProcedure(link string, body interface{}, opts 
 
 // Replace stored procedure
 func (c *DocumentDB) ReplaceUserDefinedFunction(link string, body interface{}, opts ...CallOption) (udf *UDF, err error) {
+	if c.usesAAD() {
+		return nil, errors.New("cannot perform CRUD operatons on UDFs while authenticating with Azure AD")
+	}
+
 	_, err = c.client.Replace(link, body, &udf, opts...)
 	if err != nil {
 		return nil, err
@@ -371,11 +421,16 @@ func (c *DocumentDB) ExecuteStoredProcedure(link string, params, body interface{
 	return
 }
 
+// usesAAD returns true if the client is authenticated with Azure AD
+func (c *DocumentDB) usesAAD() bool {
+	return c.config.ServicePrincipal != nil
+}
+
 // ServicePrincipalProvider is an interface for an object that provides an Azure service principal
 // It's normally used with *adal.ServicePrincipalToken objects from github.com/Azure/go-autorest/autorest/adal
 type ServicePrincipalProvider interface {
-	// EnsureFresh will refresh the token if it will expire within the refresh window. This method is safe for concurrent use.
-	EnsureFresh() error
+	// EnsureFreshWithContext will refresh the token if it will expire within the refresh window (as set by RefreshWithin) and autoRefresh flag is on. This method is safe for concurrent use.
+	EnsureFreshWithContext(ctx context.Context) error
 	// OAuthToken returns the current access token.
 	OAuthToken() string
 }
