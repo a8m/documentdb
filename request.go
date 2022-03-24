@@ -93,7 +93,7 @@ func (req *Request) DefaultHeaders(config *Config, userAgent string) (err error)
 
 		req.Header.Add(HeaderAuth, url.QueryEscape("type=master&ver=1.0&sig="+sign))
 	} else if config.ServicePrincipal != nil {
-		ctx, cancel := context.WithTimeout(context.Background(), ServicePrincipalRefreshTimeout)
+		ctx, cancel := context.WithTimeout(req.Context(), ServicePrincipalRefreshTimeout)
 		defer cancel()
 		err := config.ServicePrincipal.EnsureFreshWithContext(ctx)
 		if err != nil {

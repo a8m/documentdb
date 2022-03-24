@@ -27,6 +27,8 @@ var buffers = &sync.Pool{
 	},
 }
 
+var errAAD = errors.New("cannot perform CRUD operations on stored procedures while authenticating with Azure AD")
+
 // IdentificationHydrator defines interface for ID hydrators
 // that can prepopulate struct with default values
 type IdentificationHydrator func(config *Config, doc interface{})
@@ -120,7 +122,7 @@ func (c *DocumentDB) ReadDocument(link string, doc interface{}, opts ...CallOpti
 // Read sporc by self link
 func (c *DocumentDB) ReadStoredProcedure(link string, opts ...CallOption) (sproc *Sproc, err error) {
 	if c.usesAAD() {
-		return nil, errors.New("cannot perform CRUD operatons on stored procedures while authenticating with Azure AD")
+		return nil, errAAD
 	}
 
 	_, err = c.client.Read(link, &sproc, opts...)
@@ -133,7 +135,7 @@ func (c *DocumentDB) ReadStoredProcedure(link string, opts ...CallOption) (sproc
 // Read udf by self link
 func (c *DocumentDB) ReadUserDefinedFunction(link string, opts ...CallOption) (udf *UDF, err error) {
 	if c.usesAAD() {
-		return nil, errors.New("cannot perform CRUD operatons on UDFs while authenticating with Azure AD")
+		return nil, errAAD
 	}
 
 	_, err = c.client.Read(link, &udf, opts...)
@@ -156,7 +158,7 @@ func (c *DocumentDB) ReadCollections(db string, opts ...CallOption) (colls []Col
 // Read all sprocs by collection self link
 func (c *DocumentDB) ReadStoredProcedures(coll string, opts ...CallOption) (sprocs []Sproc, err error) {
 	if c.usesAAD() {
-		return nil, errors.New("cannot perform CRUD operatons on stored procedures while authenticating with Azure AD")
+		return nil, errAAD
 	}
 
 	return c.QueryStoredProcedures(coll, nil, opts...)
@@ -165,7 +167,7 @@ func (c *DocumentDB) ReadStoredProcedures(coll string, opts ...CallOption) (spro
 // Read pall udfs by collection self link
 func (c *DocumentDB) ReadUserDefinedFunctions(coll string, opts ...CallOption) (udfs []UDF, err error) {
 	if c.usesAAD() {
-		return nil, errors.New("cannot perform CRUD operatons on UDFs while authenticating with Azure AD")
+		return nil, errAAD
 	}
 
 	return c.QueryUserDefinedFunctions(coll, nil, opts...)
@@ -214,7 +216,7 @@ func (c *DocumentDB) QueryCollections(db string, query *Query, opts ...CallOptio
 // Read all collection `sprocs` that satisfy a query
 func (c *DocumentDB) QueryStoredProcedures(coll string, query *Query, opts ...CallOption) (sprocs []Sproc, err error) {
 	if c.usesAAD() {
-		return nil, errors.New("cannot perform CRUD operatons on stored procedures while authenticating with Azure AD")
+		return nil, errAAD
 	}
 
 	data := struct {
@@ -235,7 +237,7 @@ func (c *DocumentDB) QueryStoredProcedures(coll string, query *Query, opts ...Ca
 // Read all collection `udfs` that satisfy a query
 func (c *DocumentDB) QueryUserDefinedFunctions(coll string, query *Query, opts ...CallOption) (udfs []UDF, err error) {
 	if c.usesAAD() {
-		return nil, errors.New("cannot perform CRUD operatons on UDFs while authenticating with Azure AD")
+		return nil, errAAD
 	}
 
 	data := struct {
@@ -302,7 +304,7 @@ func (c *DocumentDB) CreateCollection(db string, body interface{}, opts ...CallO
 // Create stored procedure
 func (c *DocumentDB) CreateStoredProcedure(coll string, body interface{}, opts ...CallOption) (sproc *Sproc, err error) {
 	if c.usesAAD() {
-		return nil, errors.New("cannot perform CRUD operatons on stored procedures while authenticating with Azure AD")
+		return nil, errAAD
 	}
 
 	_, err = c.client.Create(coll+"sprocs/", body, &sproc, opts...)
@@ -315,7 +317,7 @@ func (c *DocumentDB) CreateStoredProcedure(coll string, body interface{}, opts .
 // Create user defined function
 func (c *DocumentDB) CreateUserDefinedFunction(coll string, body interface{}, opts ...CallOption) (udf *UDF, err error) {
 	if c.usesAAD() {
-		return nil, errors.New("cannot perform CRUD operatons on UDFs while authenticating with Azure AD")
+		return nil, errAAD
 	}
 
 	_, err = c.client.Create(coll+"udfs/", body, &udf, opts...)
@@ -360,7 +362,7 @@ func (c *DocumentDB) DeleteDocument(link string, opts ...CallOption) (*Response,
 // Delete stored procedure
 func (c *DocumentDB) DeleteStoredProcedure(link string, opts ...CallOption) (*Response, error) {
 	if c.usesAAD() {
-		return nil, errors.New("cannot perform CRUD operatons on stored procedures while authenticating with Azure AD")
+		return nil, errAAD
 	}
 
 	return c.client.Delete(link, opts...)
@@ -369,7 +371,7 @@ func (c *DocumentDB) DeleteStoredProcedure(link string, opts ...CallOption) (*Re
 // Delete user defined function
 func (c *DocumentDB) DeleteUserDefinedFunction(link string, opts ...CallOption) (*Response, error) {
 	if c.usesAAD() {
-		return nil, errors.New("cannot perform CRUD operatons on UDFs while authenticating with Azure AD")
+		return nil, errAAD
 	}
 
 	return c.client.Delete(link, opts...)
@@ -392,7 +394,7 @@ func (c *DocumentDB) ReplaceDocument(link string, doc interface{}, opts ...CallO
 // Replace stored procedure
 func (c *DocumentDB) ReplaceStoredProcedure(link string, body interface{}, opts ...CallOption) (sproc *Sproc, err error) {
 	if c.usesAAD() {
-		return nil, errors.New("cannot perform CRUD operatons on stored procedures while authenticating with Azure AD")
+		return nil, errAAD
 	}
 
 	_, err = c.client.Replace(link, body, &sproc, opts...)
@@ -405,7 +407,7 @@ func (c *DocumentDB) ReplaceStoredProcedure(link string, body interface{}, opts 
 // Replace stored procedure
 func (c *DocumentDB) ReplaceUserDefinedFunction(link string, body interface{}, opts ...CallOption) (udf *UDF, err error) {
 	if c.usesAAD() {
-		return nil, errors.New("cannot perform CRUD operatons on UDFs while authenticating with Azure AD")
+		return nil, errAAD
 	}
 
 	_, err = c.client.Replace(link, body, &udf, opts...)
