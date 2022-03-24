@@ -2,6 +2,7 @@ package documentdb
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -34,6 +35,8 @@ const (
 	HeaderUserAgent           = "User-Agent"
 
 	SupportedVersion = "2017-02-22"
+
+	ServicePrincipalRefreshTimeout = 10 * time.Second
 )
 
 // Request Error
@@ -90,7 +93,9 @@ func (req *Request) DefaultHeaders(config *Config, userAgent string) (err error)
 
 		req.Header.Add(HeaderAuth, url.QueryEscape("type=master&ver=1.0&sig="+sign))
 	} else if config.ServicePrincipal != nil {
-		err := config.ServicePrincipal.EnsureFresh()
+		ctx, cancel := context.WithTimeout(req.Context(), ServicePrincipalRefreshTimeout)
+		defer cancel()
+		err := config.ServicePrincipal.EnsureFreshWithContext(ctx)
 		if err != nil {
 			return err
 		}
@@ -120,12 +125,30 @@ func parse(id string) (rId, rType string) {
 	l := len(parts)
 
 	if l%2 == 0 {
-		rId = parts[l-2]
 		rType = parts[l-3]
 	} else {
-		rId = parts[l-3]
 		rType = parts[l-2]
 	}
+
+	// Check if we're being passed a _self link or a link that uses IDs
+	// If we have a self link, parts[2] should be a 6-byte, base64-encoded string, that is 8 characters long and includes padding ("==")
+	// "=" is not a valid character in a Cosmos DB identifier, so if we notice that (especially in a string that's 8-chars long), we know it's a RID
+	if l > 3 && len(parts[2]) == 8 && parts[2][6:] == "==" {
+		// We have a _self link
+		if l%2 == 0 {
+			rId = parts[l-2]
+		} else {
+			rId = parts[l-3]
+		}
+	} else {
+		// We have a link that uses IDs
+		end := l - 1
+		if l%2 == 1 {
+			end = l - 2
+		}
+		rId = strings.Join(parts[1:end], "/")
+	}
+
 	return
 }
 
