@@ -27,7 +27,7 @@ var buffers = &sync.Pool{
 	},
 }
 
-var errAAD = errors.New("cannot perform CRUD operations on stored procedures while authenticating with Azure AD")
+var errAAD = errors.New("cannot perform CRUD operations on stored procedures or UDF's while authenticating with Azure AD")
 
 // IdentificationHydrator defines interface for ID hydrators
 // that can prepopulate struct with default values
