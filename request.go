@@ -73,18 +73,18 @@ func (req *Request) DefaultHeaders(config *Config, userAgent string) (err error)
 	if config.MasterKey != nil && config.MasterKey.Key != "" {
 		b := buffers.Get().(*bytes.Buffer)
 		b.Reset()
-		b.WriteString(req.Method)
+		b.WriteString(strings.ToLower(req.Method))
 		b.WriteRune('\n')
-		b.WriteString(req.rType)
+		b.WriteString(strings.ToLower(req.rType))
 		b.WriteRune('\n')
 		b.WriteString(req.rId)
 		b.WriteRune('\n')
-		b.WriteString(req.Header.Get(HeaderXDate))
+		b.WriteString(strings.ToLower(req.Header.Get(HeaderXDate)))
 		b.WriteRune('\n')
-		b.WriteString(req.Header.Get("Date"))
+		b.WriteString(strings.ToLower(req.Header.Get("Date")))
 		b.WriteRune('\n')
 
-		sign, err := authorize(bytes.ToLower(b.Bytes()), config.MasterKey)
+		sign, err := authorize(b.Bytes(), config.MasterKey)
 		if err != nil {
 			return err
 		}
