@@ -50,6 +50,18 @@ func (e RequestError) Error() string {
 	return fmt.Sprintf("%v, %v", e.Code, e.Message)
 }
 
+// Request Error
+type RequestError429 struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+	Retry   time.Duration
+}
+
+// Implement Error function
+func (e RequestError429) Error() string {
+	return fmt.Sprintf("%v, retry after %v", e.Code, e.Retry)
+}
+
 // Resource Request
 type Request struct {
 	rId, rType string

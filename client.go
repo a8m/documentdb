@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"io"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 type Clienter interface {
@@ -147,7 +149,18 @@ func (c *Client) do(r *Request, validator statusCodeValidatorFunc, data interfac
 		return nil, err
 	}
 	if !validator(resp.StatusCode) {
-		err = &RequestError{}
+		if resp.StatusCode == 429 {
+			retry := resp.Header.Get("x-ms-retry-after-ms")
+			val, _ := strconv.Atoi(retry)
+			if val == 0 {
+				val = 100
+			}
+			err = &RequestError429{
+				Retry: time.Duration(val) * time.Millisecond,
+			}
+		} else {
+			err = &RequestError{}
+		}
 		readJson(resp.Body, &err)
 		return nil, err
 	}
